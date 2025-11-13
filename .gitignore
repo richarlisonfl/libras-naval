@@ -1,1 +1,6 @@
-/.venv
+# Ambientes virtuais Python
+venv/
+.env/
+.venv/
+env/
+ENV/
