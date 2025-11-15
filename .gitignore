@@ -4,3 +4,7 @@ venv/
 .venv/
 env/
 ENV/
+__pycache__/
+.vscode/
+Python-3.11.11/
+dados_treinamento/

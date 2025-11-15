@@ -5,12 +5,13 @@ from .utilitarios import UtilitariosMaos
 import config
 
 class ColetorDadosLibras:
-    def __init__(self):
+    def __init__(self, indice_camera=0):
         self.utilitarios = UtilitariosMaos()
         self.dados = []
         self.rotulos = []
         self.classe_atual = "A"
         self.contador_amostras = 0
+        self.indice_camera = indice_camera
         
         # Criar diretório se não existir
         os.makedirs(config.CONFIG['caminho_dados'], exist_ok=True)
@@ -24,7 +25,7 @@ class ColetorDadosLibras:
         print("Posicione sua mão e pressione ESPAÇO para capturar")
         print("Pressione 'q' para terminar ou 's' para pular")
         
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture(self.indice_camera)
         camera.set(cv2.CAP_PROP_FRAME_WIDTH, config.CONFIG['dimensao_imagem'][0])
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CONFIG['dimensao_imagem'][1])
         

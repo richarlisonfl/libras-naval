@@ -5,11 +5,12 @@ from .classificador import ClassificadorLibras
 import config
 
 class ReconhecedorLibras:
-    def __init__(self):
+    def __init__(self, indice_camera=0):
         self.utilitarios = UtilitariosMaos()
         self.classificador = ClassificadorLibras()
         self.historico = []
         self.ultima_previsao = "?"
+        self.indice_camera = indice_camera
         
     def carregar_modelo(self, nome_arquivo="modelo_libras.pkl"):
         """Carrega modelo treinado"""
@@ -21,7 +22,7 @@ class ReconhecedorLibras:
             print("ERRO: Modelo não encontrado. Treine primeiro!")
             return
         
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture(self.indice_camera)
         camera.set(cv2.CAP_PROP_FRAME_WIDTH, config.CONFIG['dimensao_imagem'][0])
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CONFIG['dimensao_imagem'][1])
         

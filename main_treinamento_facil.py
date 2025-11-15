@@ -5,6 +5,7 @@ Treinamento facilitado - versão simplificada e funcional
 
 import sys
 import os
+import time
 
 # Adicionar o diretório atual ao path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +44,10 @@ def treinar_apenas_estas_classes(classes, amostras_por_classe=5):
     if len(coletor.dados) > 0:
         print(f"\n🧠 Treinando modelo com {len(coletor.dados)} amostras...")
         classificador = ClassificadorLibras()
+        start_time = time.perf_counter()
         precisao = classificador.treinar(coletor.dados, coletor.rotulos)
+        duracao_treinamento = time.perf_counter() - start_time
+        print(f"⏱️ Tempo de treinamento: {duracao_treinamento:.2f}s")
         classificador.salvar_modelo()
         print(f"✅ Modelo treinado! Precisão: {precisao:.3f}")
         return True
