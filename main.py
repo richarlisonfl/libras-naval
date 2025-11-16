@@ -6,8 +6,19 @@ Coordena todas as funcionalidades do sistema
 
 import sys
 import os
+import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TFLITE_DEBUG_LOG_LEVEL"] = "0"
+
 import subprocess
 import time
+import config
+
+from src.main_reconhecimento_final_adaptado import ReconhecimentoApp
+from src.main_treinamento_facil_adaptado import TreinamentoApp
+from src.capturador_imagens import CapturadorImagens
 
 # Adicionar o diretório atual ao path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -34,9 +45,9 @@ def exibir_menu_principal():
     print("\n" + "-"*60)
     print("📋 MENU PRINCIPAL")
     print("-"*60)
-    print("1. 🎓 Treinamento")
-    print("2. 📸 Capturar Imagens para Treinamento")
-    print("3. 🎯 Reconhecimento em Tempo Real")
+    print("1. 🎓 Reconhecimento em Tempo Real")
+    print("2. 📸 Treinamento")
+    print("3. 🎯 Capturar Imagens para Treinamento")
     print("4. 🔍 Teste de Setup (Câmera + MediaPipe)")
     print("5. 🚪 Sair")
     print("-"*60)
@@ -81,6 +92,9 @@ def selecionar_indice_camera():
     
     while True:
         try:
+            if cameras_disponiveis:
+                return cameras_disponiveis[0]
+
             indice = int(input(f"Digite o índice da câmera (padrão 0): ").strip() or "0")
             if indice in cameras_disponiveis:
                 print(f"✅ Câmera {indice} selecionada!")
@@ -102,13 +116,10 @@ def executar_treinamento_webcam():
         return
     
     try:
-        # Executar o script de treinamento com o índice de câmera
-        resultado = subprocess.run(
-            [sys.executable, 'main_treinamento_facil_adaptado.py', '--camera', str(indice_camera), '--modo', 'webcam'],
-            cwd=os.path.dirname(os.path.abspath(__file__))
-        )
-        
-        if resultado.returncode == 0:
+        treinamento = TreinamentoApp(camera=indice_camera)
+        resultado = treinamento.run("webcam")
+
+        if resultado:
             print("\n✅ Treinamento completado com sucesso!")
         else:
             print("\n❌ Erro durante o treinamento.")
@@ -123,40 +134,19 @@ def executar_treinamento_pastas():
     print("📁 TREINAMENTO COM IMAGENS DE PASTAS")
     print("-"*60)
     
-    indice_camera = selecionar_indice_camera()
-    if indice_camera is None:
-        return
-    
-    print("\n💡 Estrutura esperada:")
-    print("   dados_treinamento/")
-    print("   ├── CLASSE_A/")
-    print("   │   ├── imagem1.jpg")
-    print("   │   ├── imagem2.jpg")
-    print("   │   └── ...")
-    print("   ├── CLASSE_B/")
-    print("   │   ├── imagem1.jpg")
-    print("   │   └── ...")
-    print("   └── ...")
-    
-    caminho_dados = input("\nDigite o caminho das pastas (padrão: dados_treinamento): ").strip()
+    caminho_dados = input(f"\nDigite o caminho das pastas (deixe vazio para utilizar o caminho padrão: {config.CONFIG['caminho_dados']}): ").strip()
     if not caminho_dados:
-        caminho_dados = "dados_treinamento"
+        caminho_dados = config.CONFIG['caminho_dados']
     
     if not os.path.exists(caminho_dados):
         print(f"❌ Caminho '{caminho_dados}' não encontrado!")
         return
     
     try:
-        # Executar o script de treinamento com pastas
-        resultado = subprocess.run(
-            [sys.executable, 'main_treinamento_facil_adaptado.py', 
-             '--modo', 'pastas', 
-             '--camera', str(indice_camera),
-             '--caminho', caminho_dados],
-            cwd=os.path.dirname(os.path.abspath(__file__))
-        )
-        
-        if resultado.returncode == 0:
+        treinamento = TreinamentoApp()
+        resultado = treinamento.run("pastas", caminho_dados)
+
+        if resultado:
             print("\n✅ Treinamento completado com sucesso!")
         else:
             print("\n❌ Erro durante o treinamento.")
@@ -176,12 +166,10 @@ def executar_reconhecimento():
         return
     
     try:
-        resultado = subprocess.run(
-            [sys.executable, 'main_reconhecimento_final_adaptado.py', '--camera', str(indice_camera)],
-            cwd=os.path.dirname(os.path.abspath(__file__))
-        )
+        reconhecimento = ReconhecimentoApp()
+        resultado = reconhecimento.run()
         
-        if resultado.returncode == 0:
+        if resultado:
             print("\n✅ Reconhecimento finalizado!")
         else:
             print("\n⚠️  Reconhecimento interrompido.")
@@ -211,7 +199,7 @@ def executar_teste_setup():
         print(f"\n❌ Erro ao executar teste: {e}")
 
 
-def executar_captura_imagens():
+def execute_images_capture():
     """Executa o capturador de imagens"""
     print("\n" + "-"*60)
     print("📸 CAPTURADOR DE IMAGENS")
@@ -222,16 +210,20 @@ def executar_captura_imagens():
         return
     
     try:
-        resultado = subprocess.run(
-            [sys.executable, 'capturador_imagens.py', '--camera', str(indice_camera)],
-            cwd=os.path.dirname(os.path.abspath(__file__))
-        )
-        
-        if resultado.returncode == 0:
+        capturador = CapturadorImagens(str(config.CONFIG['caminho_dados']), str(indice_camera))
+        # resultado = subprocess.run(
+        #     [sys.executable, 'capturador_imagens.py', '--camera', str(indice_camera)], '--caminho', str(config.CONFIG['caminho_dados']),
+        #     cwd=os.path.dirname(os.path.abspath(__file__))
+        # )
+
+        if capturador.classes:
+            capturador.capturar()
             print("\n✅ Captura concluída com sucesso!")
         else:
+            print("❌ Nenhuma classe encontrada. Crie as pastas primeiro.")
             print("\n⚠️  Captura interrompida.")
-            
+            sys.exit(1)
+
     except Exception as e:
         print(f"\n❌ Erro ao executar captura: {e}")
 
@@ -267,12 +259,12 @@ def menu_principal():
         opcao = input("Escolha uma opção (1-5): ").strip()
         
         if opcao == "1":
-            menu_treinamento()
-        elif opcao == "2":
-            executar_captura_imagens()
-            input("\n🔙 Pressione ENTER para voltar ao menu principal...")
-        elif opcao == "3":
             executar_reconhecimento()
+            input("\n🔙 Pressione ENTER para voltar ao menu principal...")
+        elif opcao == "2":
+            menu_treinamento()
+        elif opcao == "3":
+            execute_images_capture()
             input("\n🔙 Pressione ENTER para voltar ao menu principal...")
         elif opcao == "4":
             executar_teste_setup()

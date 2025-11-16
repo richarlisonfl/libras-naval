@@ -2,7 +2,10 @@ import cv2
 import numpy as np
 from .utilitarios import UtilitariosMaos
 from .classificador import ClassificadorLibras
+import sys
+import os
 import config
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 class ReconhecedorLibras:
     def __init__(self, indice_camera=0):

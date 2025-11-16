@@ -10,13 +10,10 @@ CONFIG = {
     'dimensao_imagem': (640, 480),
     'fps_camera': 30,
     'numero_amostras_por_classe': 100,
-    #'limite_confianca': 0.7
     'limite_confianca': 0.32,
-    'caminho_dados': 'dados_treinamento/',
-    'caminho_modelos': 'modelos_treinados/',
-    #'letras_treinamento': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    #'numeros_treinamento': '0123456789'
-    'letras_treinamento': 'AEIOU',
+    'caminho_dados': 'data/to_training/',
+    'caminho_modelos': 'data/generated_model/',
+    'classes_treinamento': 'AEIOU',
     'numeros_treinamento': '012345'
 }
 

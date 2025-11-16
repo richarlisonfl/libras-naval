@@ -1,8 +1,8 @@
 import cv2
 import os
 import numpy as np
-from .utilitarios import UtilitariosMaos
 import config
+from .utilitarios import UtilitariosMaos
 
 class ColetorDadosLibras:
     def __init__(self, indice_camera=0):

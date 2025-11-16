@@ -73,10 +73,11 @@ class CapturadorImagens:
         print("📷 CAPTURADOR DE IMAGENS PARA TREINAMENTO")
         print("="*70)
         
-        camera = cv2.VideoCapture(self.indice_camera)
+        camera = cv2.VideoCapture(int(self.indice_camera))
         
         if not camera.isOpened():
             print(f"❌ Não foi possível abrir a câmera com índice {self.indice_camera}")
+            camera.open()
             return False
         
         # Configurar resolução

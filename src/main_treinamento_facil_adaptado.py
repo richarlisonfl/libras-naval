@@ -62,16 +62,8 @@ class TreinamentoAdaptado:
         # Treinar modelo
         return self._treinar_modelo()
     
-    def treinar_com_pastas(self, caminho_pastas):
-        """Treina utilizando imagens de pastas (cada pasta = classe)"""
-        print(f"\n📁 Treinando com imagens de pastas: {caminho_pastas}")
-        print("-" * 60)
-        
+    def treinar_com_pastas(self, caminho_pastas):       
         caminho_base = Path(caminho_pastas)
-        
-        if not caminho_base.exists():
-            print(f"❌ Caminho não encontrado: {caminho_pastas}")
-            return False
         
         # Encontrar todas as pastas (classes)
         classes = [d.name for d in caminho_base.iterdir() if d.is_dir()]
@@ -230,122 +222,128 @@ def parse_args():
     
     return parser.parse_args()
 
+class TreinamentoApp:
+    """Classe que encapsula modos de treinamento e interface interativa.
 
-def menu_interativo(indice_camera):
-    """Menu interativo para seleção de modo de treinamento"""
-    while True:
-        print("\n" + "="*60)
-        print("🎓 TREINAMENTO FACILITADO DE LIBRAS")
-        print("="*60)
-        print("\n1. 📷 Treinar com Webcam")
-        print("2. 📁 Treinar com Imagens de Pastas")
-        print("3. 🚪 Sair")
-        print("-"*60)
-        
-        opcao = input("Escolha uma opção (1-3): ").strip()
-        
-        if opcao == "1":
-            modo_webcam(indice_camera)
-            return True
-        elif opcao == "2":
-            modo_pastas(indice_camera)
-            return True
-        elif opcao == "3":
-            print("👋 Saindo...")
+    Uso:
+        app = TreinamentoApp(camera=0)
+        app.run(mode='webcam')  # modo 'webcam'|'pastas'|None (interativo)
+    """
+
+    def __init__(self, camera: int = 0):
+        self.camera = int(camera)
+
+    def modo_webcam(self, classes: str = None, amostras_por_classe: int = None):
+        """Executa o modo webcam. Se classes não informadas, pergunta ao usuário.
+
+        classes: string com caracteres (ex: 'AEIOU' ou 'ABC123') ou None
+        amostras_por_classe: int ou None
+        """
+
+        treinador = TreinamentoAdaptado(self.camera)
+
+        if classes is None:
+            print("\nEscolha uma opção fácil:")
+            print("1. Treinar apenas vogais (A E I O U) - 5 amostras cada")
+            print("2. Treinar meus próprios caracteres")
+            print("3. Usar treinamento completo")
+            opcao = input("\nDigite sua opção (1-3): ").strip()
+
+            if opcao == "1":
+                classes = "AEIOU"
+                amostras = 5
+            elif opcao == "2":
+                letras = input("Digite as letras/números (ex: ABC123): ").strip().upper()
+                if not letras:
+                    print("❌ Nenhum caractere digitado")
+                    return False
+                classes = letras
+                amostras = input("Amostras por classe (padrão 5): ").strip()
+                amostras = int(amostras) if amostras.isdigit() else 5
+            elif opcao == "3":
+                print("⚠️  Treinamento completo - isso pode levar algum tempo!")
+                classes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                amostras = 10
+            else:
+                print("❌ Opção inválida")
+                return False
+        else:
+            amostras = amostras_por_classe or config.CONFIG.get('numero_amostras_por_classe', 5)
+
+        sucesso = treinador.treinar_com_webcam(classes, amostras)
+
+        if sucesso:
+            print("\nTreinamento finalizado com sucesso!")
+        return sucesso
+
+    def modo_pastas(self, caminho: str = None):
+        """Executa o modo pastas. Se caminho não informado, pergunta ao usuário."""
+
+        if not os.path.exists(caminho):
+            print(f"❌ Caminho não encontrado: {caminho}")
             return False
+
+        treinador = TreinamentoAdaptado(self.camera)
+        sucesso = treinador.treinar_com_pastas(caminho)
+
+        if sucesso:
+            print("\n🎉 Parabéns! Você completou o treinamento com imagens!")
+            print("👉 Agora teste com o modo de reconhecimento!")
+        return sucesso
+
+    def menu_interativo(self):
+        """Menu interativo para seleção de modo de treinamento"""
+        while True:
+            print("\n" + "="*60)
+            print("🎓 TREINAMENTO FACILITADO DE LIBRAS")
+            print("="*60)
+            print("\n1. 📷 Treinar com Webcam")
+            print("2. 📁 Treinar com Imagens de Pastas")
+            print("3. 🚪 Sair")
+            print("-"*60)
+
+            opcao = input("Escolha uma opção (1-3): ").strip()
+
+            if opcao == "1":
+                return self.modo_webcam()
+            elif opcao == "2":
+                return self.modo_pastas()
+            elif opcao == "3":
+                print("👋 Saindo...")
+                return False
+            else:
+                print("❌ Opção inválida!")
+
+    def run(self, mode: str = None, caminho: str = None, classes: str = None, amostras: int = None):
+        """Executa o modo escolhido.
+
+        mode: 'webcam'|'pastas'|None. If None, interactive menu is shown.
+        """
+        if mode == 'webcam':
+            return self.modo_webcam(classes, amostras)
+        elif mode == 'pastas':
+            return self.modo_pastas(caminho)
         else:
-            print("❌ Opção inválida!")
-
-
-def modo_webcam(indice_camera):
-    """Modo de treinamento com webcam"""
-    print("\n" + "-"*60)
-    print("📷 MODO WEBCAM")
-    print("-"*60)
-    
-    print("\nEscolha uma opção fácil:")
-    print("1. Treinar apenas vogais (A E I O U) - 5 amostras cada")
-    print("2. Treinar meus próprios caracteres")
-    print("3. Usar treinamento completo")
-    
-    opcao = input("\nDigite sua opção (1-3): ").strip()
-    
-    treinador = TreinamentoAdaptado(indice_camera)
-    
-    if opcao == "1":
-        sucesso = treinador.treinar_com_webcam("AEIOU", 5)
-    elif opcao == "2":
-        letras = input("Digite as letras/números (ex: ABC123): ").strip().upper()
-        if letras:
-            amostras = input("Amostras por classe (padrão 5): ").strip()
-            amostras = int(amostras) if amostras.isdigit() else 5
-            sucesso = treinador.treinar_com_webcam(letras, amostras)
-        else:
-            print("❌ Nenhum caractere digitado")
-            return
-    elif opcao == "3":
-        print("⚠️  Treinamento completo - isso pode levar algum tempo!")
-        sucesso = treinador.treinar_com_webcam(
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 
-            amostras_por_classe=10
-        )
-    else:
-        print("❌ Opção inválida")
-        return
-    
-    if sucesso:
-        print("\n🎉 Parabéns! Você completou o treinamento!")
-        print("👉 Agora teste com o modo de reconhecimento!")
-
-
-def modo_pastas(indice_camera):
-    """Modo de treinamento com imagens de pastas"""
-    print("\n" + "-"*60)
-    print("📁 MODO PASTAS")
-    print("-"*60)
-    
-    print("\n💡 Estrutura esperada:")
-    print("   dados_treinamento/")
-    print("   ├── CLASSE_A/")
-    print("   │   ├── imagem1.jpg")
-    print("   │   └── imagem2.jpg")
-    print("   ├── CLASSE_B/")
-    print("   │   └── ...")
-    
-    caminho = input("\nDigite o caminho da pasta (padrão: dados_treinamento): ").strip()
-    if not caminho:
-        caminho = "dados_treinamento"
-    
-    if not os.path.exists(caminho):
-        print(f"❌ Caminho não encontrado: {caminho}")
-        return
-    
-    treinador = TreinamentoAdaptado(indice_camera)
-    sucesso = treinador.treinar_com_pastas(caminho)
-    
-    if sucesso:
-        print("\n🎉 Parabéns! Você completou o treinamento com imagens!")
-        print("👉 Agora teste com o modo de reconhecimento!")
+            return self.menu_interativo()
 
 
 def main():
     """Função principal"""
     try:
         args = parse_args()
-        
         print("="*60)
         print("🎓 SISTEMA DE TREINAMENTO - LIBRAS NAVAL")
         print("="*60)
         print(f"📷 Câmera: índice {args.camera}")
-        
+
+        app = TreinamentoApp(camera=args.camera)
         if args.modo == 'webcam':
-            modo_webcam(args.camera)
+            app.run(mode='webcam')
         elif args.modo == 'pastas':
-            modo_pastas(args.camera)
+            app.run(mode='pastas', caminho=args.caminho)
         else:
-            # Se nenhum modo específico, mostrar menu interativo
-            menu_interativo(args.camera)
-    
+            app.run()
+
     except KeyboardInterrupt:
         print("\n🛑 Programa interrompido pelo usuário")
         sys.exit(0)
@@ -354,7 +352,5 @@ def main():
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
-
 if __name__ == "__main__":
     main()
