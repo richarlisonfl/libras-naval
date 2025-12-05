@@ -107,7 +107,7 @@ class ReconhecedorLibras:
         altura, largura = quadro.shape[:2]
         
         # Calcular tamanho do painel (1/4 da largura)
-        largura_painel = 500
+        largura_painel = 250
         altura_painel = 140
 
         # Fundo semi-transparente para o painel
@@ -171,9 +171,9 @@ class ReconhecedorLibras:
             self._mostrar_probabilidades_detalhadas(quadro, confianca)
         
         # Previsão suavizada do histórico
-        if self.ultima_previsao != "?":
-            cv2.putText(quadro, f"SUAVIZADO: {self.ultima_previsao}", (20, 450), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+        # if self.ultima_previsao != "?":
+        #     cv2.putText(quadro, f"SUAVIZADO: {self.ultima_previsao}", (20, 450), 
+        #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
         
         # Instruções
         cv2.putText(quadro, "Pressione 'q' para sair", (400, 470), 
