@@ -103,9 +103,21 @@ class ReconhecedorLibras:
         
     def _desenhar_interface(self, quadro, previsao, confianca):
         """Desenha interface na tela - SEMPRE mostra resultado"""
-        # Fundo para texto
-        cv2.rectangle(quadro, (0, 0), (500, 140), (0, 0, 0), -1)
+
+        altura, largura = quadro.shape[:2]
         
+        # Calcular tamanho do painel (1/4 da largura)
+        largura_painel = 500
+        altura_painel = 140
+
+        # Fundo semi-transparente para o painel
+        overlay = quadro.copy()
+        cv2.rectangle(overlay, (0, 0), (largura_painel, altura_painel), (0, 0, 0), -1)
+        cv2.addWeighted(overlay, 0.2, quadro, 0.3, 0, quadro)
+        
+        # Borda do painel
+        cv2.rectangle(quadro, (0, 0), (largura_painel, altura_painel), (0, 255, 0), 2)
+
         # Definir cores baseadas na confiança
         if confianca > 0.8:
             cor_texto = (0, 255, 0)  # Verde - Muito confiável
@@ -122,7 +134,7 @@ class ReconhecedorLibras:
         
         # Sempre mostrar a previsão, mesmo com confiança baixa
         cv2.putText(quadro, f"SINAL: {previsao}", (20, 40), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1.2, cor_texto, 3)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_texto, 3)
         
         # Mostrar confiança com barra visual
         cv2.putText(quadro, f"CONFIANCA: {confianca:.3f}", (20, 80), 
@@ -151,8 +163,8 @@ class ReconhecedorLibras:
                     (255, 255, 255), 1)
         
         # Status textual
-        cv2.putText(quadro, f"STATUS: {status}", (20, 130), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, cor_texto, 1)
+        cv2.putText(quadro, f"STATUS: {status}", (20, 135), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.3, cor_texto, 1)
         
         # Mostrar todas as probabilidades (opcional - para debug)
         if hasattr(self, 'mostrar_detalhes') and self.mostrar_detalhes:

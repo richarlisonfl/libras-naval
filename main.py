@@ -166,7 +166,7 @@ def executar_reconhecimento():
         return
     
     try:
-        reconhecimento = ReconhecimentoApp()
+        reconhecimento = ReconhecimentoApp(camera=indice_camera)
         resultado = reconhecimento.run()
         
         if resultado:
