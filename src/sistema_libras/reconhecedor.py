@@ -42,21 +42,54 @@ class ReconhecedorLibras:
             
             previsao_atual = "?"
             confianca = 0.0
-            
+            # Determinar cor do indicador (padrão ciano)
+            indicator_color = (255, 255, 0)
+
             if resultados.multi_hand_landmarks:
+                altura, largura = quadro.shape[:2]
+                tamanho_relativo = 0.25
+                side = int(min(altura, largura) * tamanho_relativo)
+                cx, cy = largura // 2, altura // 2
+                half = side // 2
+                tl_x, tl_y = cx - half, cy - half
+                br_x, br_y = cx + half, cy + half
+
                 for marcos_mao in resultados.multi_hand_landmarks:
                     # Desenhar landmarks
                     self.utilitarios.desenhar_landmarks(quadro, marcos_mao)
-                    
-                    # Fazer previsão
-                    caracteristicas = self.utilitarios.extrair_caracteristicas(marcos_mao)
-                    previsao_atual, confianca = self.classificador.prever(caracteristicas)
-                    
-                    # Atualizar histórico
-                    self._atualizar_historico(previsao_atual, confianca)
+
+                    # Calcular bounding box da mão em pixels
+                    xs = [lm.x for lm in marcos_mao.landmark]
+                    ys = [lm.y for lm in marcos_mao.landmark]
+                    min_x_px = int(min(xs) * largura)
+                    max_x_px = int(max(xs) * largura)
+                    min_y_px = int(min(ys) * altura)
+                    max_y_px = int(max(ys) * altura)
+                    center_x = (min_x_px + max_x_px) // 2
+                    center_y = (min_y_px + max_y_px) // 2
+
+                    # Verificar se o centro da mão está dentro do indicador
+                    hand_in_indicator = (center_x >= tl_x and center_x <= br_x and
+                                          center_y >= tl_y and center_y <= br_y)
+
+                    # Fazer previsão apenas se a mão estiver dentro do indicador
+                    if hand_in_indicator:
+                        caracteristicas = self.utilitarios.extrair_caracteristicas(marcos_mao)
+                        previsao_atual, confianca = self.classificador.prever(caracteristicas)
+                        # Atualizar histórico
+                        self._atualizar_historico(previsao_atual, confianca)
+
+                        # Mudar cor do indicador: verde se classe reconhecida, azul se só mão detectada
+                        if previsao_atual != "?":
+                            indicator_color = (0, 255, 0)  # verde
+                        else:
+                            indicator_color = (255, 0, 0)  # azul
+
+                        # Já encontramos uma mão relevante — não processar outras
+                        break
             
-            # Exibir resultados
-            self._desenhar_interface(quadro, previsao_atual, confianca)
+            # Exibir resultados (passar cor do indicador)
+            self._desenhar_interface(quadro, previsao_atual, confianca, indicator_color)
             
             cv2.imshow("Reconhecimento de Libras", quadro)
             
@@ -101,11 +134,23 @@ class ReconhecedorLibras:
         cv2.putText(quadro, "Pressione 'q' para sair", (400, 470), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         
-    def _desenhar_interface(self, quadro, previsao, confianca):
+    def _desenhar_interface(self, quadro, previsao, confianca, indicator_color=None):
         """Desenha interface na tela - SEMPRE mostra resultado"""
 
         altura, largura = quadro.shape[:2]
         
+        # Indicador central (onde posicionar a mão para reconhecimento)
+        # Quadrado de tamanho relativo à menor dimensão do frame
+        tamanho_relativo = 0.25
+        side = int(min(altura, largura) * tamanho_relativo)
+        cx, cy = largura // 2, altura // 2
+        half = side // 2
+        tl = (cx - half, cy - half)
+        br = (cx + half, cy + half)
+        cor_indicador = indicator_color if indicator_color is not None else (255, 255, 0)  # ciano BGR
+        espessura = 1
+        cv2.rectangle(quadro, tl, br, cor_indicador, espessura, lineType=cv2.LINE_AA)
+
         # Calcular tamanho do painel (1/4 da largura)
         largura_painel = 250
         altura_painel = 140

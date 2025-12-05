@@ -16,6 +16,8 @@ from pathlib import Path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import config
+from sistema_libras.utilitarios import UtilitariosMaos
+from sistema_libras.classificador import ClassificadorLibras
 
 
 class CapturadorImagens:
@@ -27,6 +29,21 @@ class CapturadorImagens:
         self.classes = []
         self.classe_atual = 0
         self.contador_atual = {}
+        # Utilitários para detectar mãos e (opcionalmente) classificar
+        try:
+            self.utilitarios = UtilitariosMaos()
+        except Exception:
+            self.utilitarios = None
+
+        # Carregar classificador se disponível
+        try:
+            clf = ClassificadorLibras()
+            if clf.carregar_modelo():
+                self.classificador = clf
+            else:
+                self.classificador = None
+        except Exception:
+            self.classificador = None
         
         # Verificar e criar pastas de classes
         self._verificar_pastas()
@@ -109,8 +126,49 @@ class CapturadorImagens:
             # Criar cópia para exibição (com interface)
             quadro_display = quadro.copy()
             
+            # Determinar cor do indicador dinamicamente
+            indicator_color = (255, 255, 0)  # ciano padrão
+            if self.utilitarios is not None:
+                quadro_rgb = cv2.cvtColor(quadro, cv2.COLOR_BGR2RGB)
+                resultados = self.utilitarios.maos.process(quadro_rgb)
+                if resultados.multi_hand_landmarks:
+                    altura, largura = quadro.shape[:2]
+                    tamanho_relativo = 0.25
+                    side = int(min(altura, largura) * tamanho_relativo)
+                    cx, cy = largura // 2, altura // 2
+                    half = side // 2
+                    tl_x, tl_y = cx - half, cy - half
+                    br_x, br_y = cx + half, cy + half
+
+                    for marcos_mao in resultados.multi_hand_landmarks:
+                        xs = [lm.x for lm in marcos_mao.landmark]
+                        ys = [lm.y for lm in marcos_mao.landmark]
+                        min_x_px = int(min(xs) * largura)
+                        max_x_px = int(max(xs) * largura)
+                        min_y_px = int(min(ys) * altura)
+                        max_y_px = int(max(ys) * altura)
+                        center_x = (min_x_px + max_x_px) // 2
+                        center_y = (min_y_px + max_y_px) // 2
+
+                        if (center_x >= tl_x and center_x <= br_x and
+                                center_y >= tl_y and center_y <= br_y):
+                            # Mão dentro do indicador -> azul
+                            indicator_color = (255, 0, 0)
+                            # Se houver classificador, testar previsão
+                            if self.classificador is not None:
+                                caracteristicas = self.utilitarios.extrair_caracteristicas(marcos_mao)
+                                label, conf = self.classificador.prever(caracteristicas)
+                                if label != "?":
+                                    indicator_color = (0, 255, 0)  # verde
+                            # Desenhar landmarks APENAS na cópia de exibição
+                            try:
+                                self.utilitarios.desenhar_landmarks(quadro_display, marcos_mao)
+                            except Exception:
+                                pass
+                            break
+
             # Desenhar interface apenas na cópia de exibição
-            self._desenhar_interface(quadro_display, classe)
+            self._desenhar_interface(quadro_display, classe, indicator_color)
             
             cv2.imshow("Capturador de Imagens", quadro_display)
             
@@ -139,7 +197,7 @@ class CapturadorImagens:
         
         return True
     
-    def _desenhar_interface(self, quadro, classe):
+    def _desenhar_interface(self, quadro, classe, indicator_color=None):
         """Desenha interface no canto superior esquerdo"""
         altura, largura = quadro.shape[:2]
         
@@ -186,24 +244,56 @@ class CapturadorImagens:
         
         cv2.putText(quadro, "Q: Sair", (margem_x, margem_y + espacamento * 3 + 75),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+        # Indicador central (onde posicionar a mão)
+        # Tamanho relativo: 25% do menor lado da imagem
+        tamanho_relativo = 0.25
+        side = int(min(altura, largura) * tamanho_relativo)
+        cx, cy = largura // 2, altura // 2
+        half = side // 2
+        tl = (cx - half, cy - half)
+        br = (cx + half, cy + half)
+        cor_indicador = indicator_color if indicator_color is not None else (255, 255, 0)  # ciano em BGR
+        espessura = 1  # borda fina
+        cv2.rectangle(quadro, tl, br, cor_indicador, espessura, lineType=cv2.LINE_AA)
     
     def _salvar_imagem(self, quadro, classe):
         """Salva a imagem na pasta da classe"""
         pasta_classe = self.caminho_dados / classe
         pasta_classe.mkdir(parents=True, exist_ok=True)
         
+        # Calcular corte central com o mesmo tamanho do indicador
+        # altura, largura = quadro.shape[:2]
+        # tamanho_relativo = 0.25
+        # side = int(min(altura, largura) * tamanho_relativo)
+        # cx, cy = largura // 2, altura // 2
+        # half = side // 2
+        # x1 = max(0, cx - half)
+        # y1 = max(0, cy - half)
+        # x2 = min(largura, cx + half)
+        # y2 = min(altura, cy + half)
+
+        # Se o corte for inválido, salva a imagem inteira como fallback
+        # if x2 <= x1 or y2 <= y1:
+        #     regioesalvar = quadro
+        # else:
+        #     regioesalvar = quadro[y1:y2, x1:x2]
+
         # Incrementar contador
         self.contador_atual[classe] += 1
         contador = self.contador_atual[classe]
-        
+
         # Nome do arquivo
         nome_arquivo = f"{classe}_{contador:04d}.jpg"
         caminho_completo = pasta_classe / nome_arquivo
-        
-        # Salvar
+
+        # Salvar apenas a região cortada
+        # cv2.imwrite(str(caminho_completo), regioesalvar)
         cv2.imwrite(str(caminho_completo), quadro)
         
         print(f"✅ Salvo: {caminho_completo}")
+
+        # print(f"✅ Salvo (cortado): {caminho_completo}  — região {x1},{y1} -> {x2},{y2}")
     
     def _exibir_sumario(self):
         """Exibe sumário de imagens capturadas"""
