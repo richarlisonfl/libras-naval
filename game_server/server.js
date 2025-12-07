@@ -5,11 +5,11 @@ const app = express();
 const PORT = 3000;
 
 // Servir arquivos estáticos da pasta "public"
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../game_interface')));
 
 // Rota padrão
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../game_interface', 'index.html'));
 });
 
 app.listen(PORT, () => {
