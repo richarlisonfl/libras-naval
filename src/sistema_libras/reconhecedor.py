@@ -113,27 +113,6 @@ class ReconhecedorLibras:
                 previsao_final = max(set(previsoes), key=previsoes.count)
                 self.ultima_previsao = previsao_final
     
-    def _desenhar_interface1(self, quadro, previsao, confianca):
-        """Desenha interface na tela"""
-        # Fundo para texto
-        cv2.rectangle(quadro, (0, 0), (400, 120), (0, 0, 0), -1)
-        
-        # Previsão atual
-        cor_texto = (0, 255, 0) if confianca > config.CONFIG['limite_confianca'] else (0, 0, 255)
-        cv2.putText(quadro, f"SINAL: {previsao}", (20, 40), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 1, cor_texto, 2)
-        cv2.putText(quadro, f"CONFIANCA: {confianca:.2f}", (20, 80), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_texto, 2)
-        
-        # Previsão suavizada do histórico
-        if self.ultima_previsao != "?":
-            cv2.putText(quadro, f"SUAVIZADO: {self.ultima_previsao}", (20, 450), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
-        
-        # Instruções
-        cv2.putText(quadro, "Pressione 'q' para sair", (400, 470), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        
     def _desenhar_interface(self, quadro, previsao, confianca, indicator_color=None):
         """Desenha interface na tela - SEMPRE mostra resultado"""
 
@@ -156,9 +135,13 @@ class ReconhecedorLibras:
         altura_painel = 140
 
         # Fundo semi-transparente para o painel
+        # OBS: a lógica abaixo escurece toda a imagem porque faz blend
+        # entre a imagem original e a cópia (overlay). Isso deixa o
+        # quadro mais escuro globalmente. Comentado para preservar
+        # brilho da imagem inteira (painel ainda será desenhado em cima).
         overlay = quadro.copy()
         cv2.rectangle(overlay, (0, 0), (largura_painel, altura_painel), (0, 0, 0), -1)
-        cv2.addWeighted(overlay, 0.2, quadro, 0.3, 0, quadro)
+        cv2.addWeighted(overlay, 0.3, quadro, 0.7, 0, quadro)
         
         # Borda do painel
         cv2.rectangle(quadro, (0, 0), (largura_painel, altura_painel), (0, 255, 0), 2)

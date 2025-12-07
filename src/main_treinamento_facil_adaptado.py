@@ -94,6 +94,31 @@ class TreinamentoAdaptado:
                         print(f"   ⚠️  Não foi possível ler: {caminho_imagem.name}")
                         continue
                     
+                    #imagem = cv2.flip(imagem, 1)
+                    imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
+                    resultados = self.utilitarios.maos.process(imagem_rgb)
+                    
+                    if resultados.multi_hand_landmarks:
+                        # Usar o primeiro marcador de mão
+                        marcos_mao = resultados.multi_hand_landmarks[0]
+                        caracteristicas = self.utilitarios.extrair_caracteristicas(marcos_mao)
+                        self.dados.append(caracteristicas)
+                        self.rotulos.append(classe)
+                        print(f"   ✅ {idx}. {caminho_imagem.name} - OK")
+                    else:
+                        print(f"   ⚠️  {idx}. {caminho_imagem.name} - Mão não detectada")
+                        
+                except Exception as e:
+                    print(f"   ❌ {idx}. {caminho_imagem.name} - Erro: {e}")
+
+            print(f"Gravando com a mão oposta...")
+            for idx, caminho_imagem in enumerate(imagens, 1):
+                try:
+                    imagem = cv2.imread(str(caminho_imagem))
+                    if imagem is None:
+                        print(f"   ⚠️  Não foi possível ler: {caminho_imagem.name}")
+                        continue
+                    
                     imagem = cv2.flip(imagem, 1)
                     imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
                     resultados = self.utilitarios.maos.process(imagem_rgb)

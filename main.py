@@ -211,10 +211,6 @@ def execute_images_capture():
     
     try:
         capturador = CapturadorImagens(str(config.CONFIG['caminho_dados']), str(indice_camera))
-        # resultado = subprocess.run(
-        #     [sys.executable, 'capturador_imagens.py', '--camera', str(indice_camera)], '--caminho', str(config.CONFIG['caminho_dados']),
-        #     cwd=os.path.dirname(os.path.abspath(__file__))
-        # )
 
         if capturador.classes:
             capturador.capturar()
