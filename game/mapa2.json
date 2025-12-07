@@ -1,0 +1,7 @@
+{
+    "navios": {
+        "submarino": ["cell-2-A"],
+        "destroyer": ["cell-3-E", "cell-3-I"],
+        "portaAvioes": ["cell-4-A", "cell-4-E", "cell-4-I"]
+    }
+}

@@ -17,6 +17,22 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Adicionar o diretório atual ao path para importar o módulo sistema_libras
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Tentativa de import inteligente para permitir execução direta e como módulo
+try:
+    # Quando executado como parte de um pacote (python -m src.main_reconhecimento_final_adaptado)
+    from .camera import Camera
+except Exception:
+    try:
+        # Quando executado diretamente (python src/main_reconhecimento_final_adaptado.py)
+        from src.camera import Camera
+    except Exception:
+        # Fallback: garantir que o diretório pai esteja no sys.path e tentar novamente
+        import sys as _sys, os as _os
+        _parent = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        if _parent not in _sys.path:
+            _sys.path.insert(0, _parent)
+        from src.camera import Camera
+
 
 def parse_args():
     """Parse de argumentos da linha de comando"""
@@ -83,7 +99,13 @@ class ReconhecimentoApp:
 def main():
     """Função principal usada quando o script é executado diretamente."""
     args = parse_args()
-    app = ReconhecimentoApp(camera=args.camera)
+    indice_camera = Camera.selecionar_indice_camera()
+    if indice_camera is None:
+        camera_index = args.camera
+    else:
+        camera_index = indice_camera
+
+    app = ReconhecimentoApp(camera=camera_index)
     app.run()
 
 

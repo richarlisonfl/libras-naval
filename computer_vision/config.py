@@ -11,8 +11,8 @@ CONFIG = {
     'fps_camera': 30,
     'numero_amostras_por_classe': 100,
     'limite_confianca': 0.32,
-    'caminho_dados': 'data/to_training/',
-    'caminho_modelos': 'data/generated_model/',
+    'caminho_dados': 'computer_vision/data/to_training/',
+    'caminho_modelos': 'computer_vision/data/generated_model/',
     'classes_treinamento': 'AEIOU',
     'numeros_treinamento': '012345'
 }

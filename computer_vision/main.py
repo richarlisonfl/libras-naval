@@ -19,6 +19,7 @@ import config
 from src.main_reconhecimento_final_adaptado import ReconhecimentoApp
 from src.main_treinamento_facil_adaptado import TreinamentoApp
 from src.capturador_imagens import CapturadorImagens
+from src.camera import Camera
 
 # Adicionar o diretório atual ao path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -63,55 +64,13 @@ def exibir_menu_treinamento():
     print("3. 🔙 Voltar ao Menu Principal")
     print("-"*60)
 
-
-def selecionar_indice_camera():
-    """Permite ao usuário selecionar o índice da câmera"""
-    print("\n" + "-"*60)
-    print("🎥 SELEÇÃO DE CÂMERA")
-    print("-"*60)
-    
-    import cv2
-    
-    cameras_disponiveis = []
-    print("🔍 Procurando câmeras disponíveis...")
-    
-    for i in range(10):
-        camera = cv2.VideoCapture(i)
-        if camera.isOpened():
-            cameras_disponiveis.append(i)
-            print(f"   ✅ Câmera {i} encontrada")
-            camera.release()
-        else:
-            camera.release()
-    
-    if not cameras_disponiveis:
-        print("   ❌ Nenhuma câmera encontrada!")
-        return None
-    
-    print("\nCâmeras disponíveis:", cameras_disponiveis)
-    
-    while True:
-        try:
-            if cameras_disponiveis:
-                return cameras_disponiveis[0]
-
-            indice = int(input(f"Digite o índice da câmera (padrão 0): ").strip() or "0")
-            if indice in cameras_disponiveis:
-                print(f"✅ Câmera {indice} selecionada!")
-                return indice
-            else:
-                print(f"❌ Câmera {indice} não encontrada. Tente novamente.")
-        except ValueError:
-            print("❌ Digite um número válido.")
-
-
 def executar_treinamento_webcam():
     """Executa o treinamento via webcam"""
     print("\n" + "-"*60)
     print("📷 TREINAMENTO COM WEBCAM")
     print("-"*60)
     
-    indice_camera = selecionar_indice_camera()
+    indice_camera = Camera.selecionar_indice_camera()
     if indice_camera is None:
         return
     
@@ -161,7 +120,7 @@ def executar_reconhecimento():
     print("🎯 RECONHECIMENTO EM TEMPO REAL")
     print("-"*60)
     
-    indice_camera = selecionar_indice_camera()
+    indice_camera = Camera.selecionar_indice_camera()
     if indice_camera is None:
         return
     
@@ -205,7 +164,7 @@ def execute_images_capture():
     print("📸 CAPTURADOR DE IMAGENS")
     print("-"*60)
     
-    indice_camera = selecionar_indice_camera()
+    indice_camera = Camera.selecionar_indice_camera()
     if indice_camera is None:
         return
     
