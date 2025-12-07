@@ -97,7 +97,7 @@ pushd "%BASE_DIR%game" || (
     exit /b 1
 )
 echo Iniciando servidor HTTP na porta 5501...
-start "" python -m http.server 5501
+start "" cmd /c "npm install && npm start server.js"
 popd
 
 :: ================================
