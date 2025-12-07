@@ -112,8 +112,8 @@ trap cleanup SIGINT
 ###############################################
 cd "$BASE_DIR/game" || { echo "Erro: pasta game não encontrada"; exit 1; }
 
-echo "Iniciando servidor HTTP na porta 5501..."
-python3 -m http.server 5501 &
+echo "Iniciando servidor HTTP na porta 3000..."
+npm install && npm start server.js &
 SERVER_PID=$!
 echo "Servidor HTTP PID: $SERVER_PID"
 
