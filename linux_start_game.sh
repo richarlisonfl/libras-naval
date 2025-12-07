@@ -45,6 +45,8 @@ fi
 if [ ! -d "$VENV_DIR" ]; then
     echo "Criando ambiente virtual em $VENV_DIR..."
     python3.11 -m venv "$VENV_DIR" || { echo "Erro ao criar venv"; exit 1; }
+else
+    echo "Ambiente virtual já existe. Pulando criação."
 fi
 
 # Ativar ambiente virtual
@@ -55,22 +57,39 @@ echo "Ambiente virtual ativado."
 # 3) Instalar dependências do requirements.txt
 ###############################################
 if [ ! -f "$REQ_FILE" ]; then
-    echo "Arquivo requirements.txt não encontrado em:"
+    echo "Arquivo requirements.txt não encontrado:"
     echo "$REQ_FILE"
     exit 1
 fi
 
-echo "Verificando dependências do requirements.txt..."
+echo "Verificando dependências..."
 
-# Calcula hash das libs instaladas
-INSTALLED_HASH="$(pip freeze | sha256sum | awk '{print $1}')"
-REQ_HASH="$(sha256sum "$REQ_FILE" | awk '{print $1}')"
+deps_faltando=false
 
-if [ "$INSTALLED_HASH" != "$REQ_HASH" ]; then
-    echo "Dependências diferentes — Instalando/Atualizando pacotes..."
+while IFS= read -r line || [ -n "$line" ]; do
+    # Ignorar linhas vazias ou comentários
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    
+    pkg=$(echo "$line" | cut -d'=' -f1)
+    ver_esperada="$line"
+    ver_instalada=$(pip show "$pkg" 2>/dev/null | grep Version | awk '{print $2}')
+
+    if [ -z "$ver_instalada" ]; then
+        echo "Pacote ausente: $pkg"
+        deps_faltando=true
+    else
+        if [ "$line" != "$pkg==$ver_instalada" ]; then
+            echo "Versão divergente: $pkg (instalada $ver_instalada, esperado $ver_esperada)"
+            deps_faltando=true
+        fi
+    fi
+done < "$REQ_FILE"
+
+if [ "$deps_faltando" = true ]; then
+    echo "Instalando/Atualizando dependências..."
     pip install -r "$REQ_FILE" || { echo "Erro ao instalar dependências"; exit 1; }
 else
-    echo "Todas as dependências já estão atualizadas."
+    echo "Todas as dependências já estão satisfeitas."
 fi
 
 ###############################################
