@@ -11,14 +11,15 @@ Python-3.11.11/
 dados_treinamento/
 node_modules/
 
-data/to_training/1
-data/to_training/2
-data/to_training/3
-data/to_training/4
-data/to_training/5
-data/to_training/a
-data/to_training/b
-data/to_training/c
-data/to_training/d
-data/to_training/e
-data/to_training/f
+computer_vision/data/to_training/1
+computer_vision/data/to_training/2
+computer_vision/data/to_training/3
+computer_vision/data/to_training/4
+computer_vision/data/to_training/5
+computer_vision/data/to_training/a
+computer_vision/data/to_training/e
+computer_vision/data/to_training/i
+computer_vision/data/to_training/o
+computer_vision/data/to_training/u
+computer_vision/data/to_training/ok
+computer_vision/data/to_training/limpar

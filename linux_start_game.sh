@@ -1,8 +1,17 @@
 #!/bin/bash
 
-# Caminho base do script
-BASE_DIR="$(dirname "$0")"
-VENV_DIR="$BASE_DIR/computer_vision/.venv311"
+# Caminho base do script (resolvido para caminho absoluto)
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Preferir um venv já existente; manter compatibilidade com .venv311
+if [ -d "$BASE_DIR/.venv" ]; then
+    VENV_DIR="$BASE_DIR/.venv"
+elif [ -d "$BASE_DIR/computer_vision/.venv" ]; then
+    VENV_DIR="$BASE_DIR/computer_vision/.venv"
+elif [ -d "$BASE_DIR/computer_vision/.venv311" ]; then
+    VENV_DIR="$BASE_DIR/computer_vision/.venv311"
+else
+    VENV_DIR="$BASE_DIR/computer_vision/.venv311"
+fi
 REQ_FILE="$BASE_DIR/computer_vision/requirements.txt"
 
 ###############################################
@@ -123,8 +132,15 @@ echo "Servidor HTTP PID: $SERVER_PID"
 cd "$BASE_DIR" || exit 1
 
 echo "Iniciando script de reconhecimento..."
-python3.11 computer_vision/src/reconhecimento_app.py &
-RECON_PID=$!
+# Use o python do venv para garantir as dependências corretas
+if [ -x "$VENV_DIR/bin/python" ]; then
+    "$VENV_DIR/bin/python" computer_vision/src/reconhecimento_app.py &
+    RECON_PID=$!
+else
+    # fallback para python3.11 do sistema
+    python3.11 computer_vision/src/reconhecimento_app.py &
+    RECON_PID=$!
+fi
 echo "Reconhecimento PID: $RECON_PID"
 
 echo "Pressione Ctrl+C para encerrar ambos os processos."

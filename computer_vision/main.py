@@ -16,8 +16,8 @@ import subprocess
 import time
 import config
 
-from computer_vision.src.reconhecimento_app import ReconhecimentoApp
-from computer_vision.src.treinamento_app import TreinamentoApp
+from src.reconhecimento_app import ReconhecimentoApp
+from src.treinamento_app import TreinamentoApp
 from src.capturador_imagens import CapturadorImagens
 from src.camera import Camera
 
