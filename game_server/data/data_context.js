@@ -1,39 +1,20 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 async function conectar() {
-  try {
-    const conn = await mysql.createConnection({
-      host: 'localhost',
-      user: 'seu_usuario',
-      password: 'sua_senha',
-      database: 'nome_do_banco',
-      port: 3306
+    return mysql.createConnection({
+        host: process.env.DATABASE_HOST,
+        user: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE_NAME,
+        port: process.env.DATABASE_PORT
     });
-
-    console.log('Conectado ao MariaDB!');
-
-    const [rows] = await conn.query('SELECT NOW() AS data');
-    console.log(rows);
-
-    await conn.end();
-  } catch (err) {
-    console.error('Erro:', err);
-  }
 }
 
-//conectar();
-
 async function selectAllNickNames() {
-    const conn = await mysql.createConnection({
-        host: '127.0.0.1',
-        user: 'seu_usuario',
-        password: 'sua_senha',
-        database: 'nome_do_banco',
-        port: 3306
-    });
-    try {
-
-        const rows = await conn.query(
+    try{
+        const conn = await conectar();
+        const [rows] = await conn.query(
             'select * from apelidos where apelido not in (select apelido from usuario)'
         );
         console.log(rows);
@@ -41,10 +22,10 @@ async function selectAllNickNames() {
     } catch (error) {
         console.error('Error fetching nicknames:', error);
         return { error: 'Erro ao conectar ao banco de dados', details: error.message };
-    } finally {
-        await conn.end();
     }
 }
+
+// selectAllNickNames()
 
 // SELECT example
 async function selectUsers() {

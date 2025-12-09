@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../game_interface', 'index.html'));
 });
 
-app.get('/get-nick-name', (req, res) => {
-  res.send(context.selectAllNickNames());
+app.get('/get-nickname', async (req, res) => {
+  res.send({ nicknames: await context.selectAllNickNames()});
 })
 
 app.listen(PORT, () => {
