@@ -6,6 +6,8 @@ import sys
 import os
 import config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+import time
+import websocketConnect
 
 class ReconhecedorLibras:
     def __init__(self, indice_camera=0):
@@ -14,6 +16,12 @@ class ReconhecedorLibras:
         self.historico = []
         self.ultima_previsao = "?"
         self.indice_camera = indice_camera
+        # Instanciar servidor WebSocket (mantém conexões abertas)
+        try:
+            self.websocket_server = websocketConnect.WebsocketServer()
+        except Exception:
+            # Caso não queira iniciar servidor aqui, permita continuar sem websocket
+            self.websocket_server = None
         
     def carregar_modelo(self, nome_arquivo="modelo_libras.pkl"):
         """Carrega modelo treinado"""
@@ -86,6 +94,21 @@ class ReconhecedorLibras:
                             indicator_color = (255, 0, 0)  # azul
 
                         # Já encontramos uma mão relevante — não processar outras
+                        # Enviar mensagem via websocket se alta confiança
+                        try:
+                            if confianca > 0.8 and previsao_atual != "?":
+                                if not hasattr(self, '_ultima_classe_enviada') or self._ultima_classe_enviada != previsao_atual or (time.time() - self._tempo_ultima_classe) > 1.0:
+                                    # Enviar via servidor WebSocket instanciado (se existir)
+                                    if getattr(self, 'websocket_server', None) is not None:
+                                        try:
+                                            self.websocket_server.send_message(previsao_atual)
+                                        except Exception:
+                                            pass
+                                    self._ultima_classe_enviada = previsao_atual
+                                    self._tempo_ultima_classe = time.time()
+                        except Exception:
+                            pass
+
                         break
             
             # Exibir resultados (passar cor do indicador)
@@ -215,3 +238,7 @@ class ReconhecedorLibras:
             pass
         except:
             pass
+
+    def _enviar_para_clientes(self, mensagem):
+        # Método removido. Use `self.websocket_server.send_message(...)`.
+        raise NotImplementedError("Use self.websocket_server.send_message(message)")

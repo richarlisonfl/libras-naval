@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const context = require('./data/data_context');
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,10 @@ app.use(express.static(path.join(__dirname, '../game_interface')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../game_interface', 'index.html'));
 });
+
+app.get('/get-nick-name', (req, res) => {
+  res.send(context.selectAllNickNames());
+})
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

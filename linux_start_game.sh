@@ -110,7 +110,7 @@ trap cleanup SIGINT
 ###############################################
 # 4) Iniciar servidor HTTP
 ###############################################
-cd "$BASE_DIR/game" || { echo "Erro: pasta game não encontrada"; exit 1; }
+cd "$BASE_DIR/game_server" || { echo "Erro: pasta game não encontrada"; exit 1; }
 
 echo "Iniciando servidor HTTP na porta 3000..."
 npm install && npm start server.js &
@@ -123,7 +123,7 @@ echo "Servidor HTTP PID: $SERVER_PID"
 cd "$BASE_DIR" || exit 1
 
 echo "Iniciando script de reconhecimento..."
-python3.11 computer_vision/src/main_reconhecimento_final_adaptado.py &
+python3.11 computer_vision/src/reconhecimento_app.py &
 RECON_PID=$!
 echo "Reconhecimento PID: $RECON_PID"
 

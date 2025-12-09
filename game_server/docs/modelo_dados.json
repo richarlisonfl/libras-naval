@@ -1,0 +1,14 @@
+//user
+{
+ "id": int,
+ "apelido": string 	//varchar(5)
+}
+
+//cell
+{
+ "user_id": string,
+ "coluna": int, 	//letras=a,e,i,o,u
+ "linha": int,		//numeros=1,2,3,4,5
+ "estado": string, 	//1=atacado,2=atingido,3=vazio
+ "label": string 	//ex.: a1, b3, c5  	
+}
