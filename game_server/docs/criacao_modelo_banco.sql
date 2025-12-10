@@ -2,6 +2,16 @@ CREATE DATABASE naval_libras
 
 use naval_libras
 
+--############# Creating user #############
+--Step 1
+CREATE USER 'naval_libras'@'localhost' IDENTIFIED BY 'naval_libras';
+
+--Step 2
+GRANT ALL PRIVILEGES ON *.* TO 'naval_libras'@'localhost';
+
+--Step 3
+FLUSH PRIVILEGES;
+
 --############# Creating Tables #############
 create table usuario (
  id int AUTO_INCREMENT primary key,
