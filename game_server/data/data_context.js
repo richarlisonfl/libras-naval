@@ -12,8 +12,8 @@ async function conectar() {
 }
 
 async function selectAllNickNames() {
+    const conn = await conectar();
     try{
-        const conn = await conectar();
         const [rows] = await conn.query(
             'select * from apelidos where apelido not in (select apelido from usuario)'
         );
@@ -22,56 +22,114 @@ async function selectAllNickNames() {
     } catch (error) {
         console.error('Error fetching nicknames:', error);
         return { error: 'Erro ao conectar ao banco de dados', details: error.message };
+    } finally {
+        conn.end();
     }
 }
 
-// selectAllNickNames()
-
-// SELECT example
-async function selectUsers() {
+async function insertUser(nickname) {
+    const conn = await conectar();
     try {
-        const rows = await query('SELECT * FROM users');
-        console.log(rows);
-        return rows;
-    } catch (error) {
-        console.error('Error selecting users:', error);
-        return { error: 'Erro ao selecionar usuários', details: error.message };
-    }
-}
-
-// INSERT example
-async function insertUser(name, email) {
-    try {
-        const result = await query(
-            'INSERT INTO users (name, email) VALUES (?, ?)',
-            [name, email]
+        const result = await conn.query(
+            'INSERT INTO usuario (apelido) VALUES (?)',
+            [nickname]
         );
-        console.log('User inserted:', result.insertId);
+        console.log('User inserted:', result[0].insertId);
         return result;
     } catch (error) {
         console.error('Error inserting user:', error);
         return { error: 'Erro ao inserir usuário', details: error.message };
+    } finally {
+        conn.end();
     }
 }
 
-// UPDATE example
-async function updateUser(id, name, email) {
+async function insertCell(userId, cell) {
+    const conn = await conectar();
     try {
-        const result = await query(
-            'UPDATE users SET name = ?, email = ? WHERE id = ?',
-            [name, email, id]
+        const columnIndex = GetColumnIndex(cell.coluna);
+        const result = await conn.query(
+            'INSERT INTO celula (usuario_id, indice_coluna, indice_linha, estado_id, navio) VALUES(?, ?, ?, ?, ?)',
+            [userId, columnIndex, cell.linha, cell.estadoId, cell.navio]
         );
-        console.log('User updated:', result.affectedRows);
+        console.log('Cell inserted:', result[0].insertId);
         return result;
     } catch (error) {
-        console.error('Error updating user:', error);
-        return { error: 'Erro ao atualizar usuário', details: error.message };
+        console.error('Error inserting cell:', error);
+        return { error: 'Erro ao inserir cell', details: error.message };
+    } finally {
+        conn.end();
     }
+}
+
+async function getUserByNickname(nickName) {
+    const conn = await conectar();
+    try{
+        const [rows] = await conn.query(
+            'select * from usuario where apelido = ?',
+            [nickName]
+        );
+        console.log(rows);
+        return rows;
+    } catch (error) {
+        console.error('Error fetching nicknames:', error);
+        return { error: 'Erro ao conectar ao banco de dados', details: error.message };
+    } finally {
+        conn.end();
+    }
+}
+
+async function getRank() {
+    const conn = await conectar();
+    try{
+        const [rows] = await conn.query(
+            'select ' +
+            '    u.apelido, ' +
+            '    count(c.id) as total_atingido ' +
+            'from celula c  ' +
+            'join usuario u on u.id = c.usuario_id ' + 
+            'where c.navio = true and c.estado_id = 1 ' + 
+            'group by u.apelido ' +
+            'order by 2 desc'
+        );
+        console.log(rows);
+        return rows;
+    } catch (error) {
+        console.error('Error fetching nicknames:', error);
+        return { error: 'Erro ao conectar ao banco de dados', details: error.message };
+    } finally {
+        conn.end();
+    }
+}
+
+function GetColumnIndex(column){
+    const map = new Map([
+        ['A', 1],
+        ["E", 2],
+        ["I", 3],
+        ["O", 4],
+        ["U", 5]
+    ]);
+    console.log(map.get(column));
+    return map.get(column);
+}
+
+function GetColumnValue(column){
+    const map = new Map([
+        [1, "A"],
+        [2, "E"],
+        [3, "I"],
+        [4, "O"],
+        [5, "U"]
+    ]);
+    console.log(map.get(column));
+    return map.get(column);
 }
 
 module.exports = {
     selectAllNickNames,
-    selectUsers,
+    getUserByNickname,
     insertUser,
-    updateUser,
+    insertCell,
+    getRank
 };

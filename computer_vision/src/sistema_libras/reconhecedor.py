@@ -97,7 +97,7 @@ class ReconhecedorLibras:
                         # Enviar mensagem via websocket se alta confiança
                         try:
                             if confianca > 0.8 and previsao_atual != "?":
-                                if not hasattr(self, '_ultima_classe_enviada') or self._ultima_classe_enviada != previsao_atual or (time.time() - self._tempo_ultima_classe) > 1.0:
+                                if not hasattr(self, '_ultima_classe_enviada') or self._ultima_classe_enviada != previsao_atual or (time.time() - self._tempo_ultima_classe) > 3.0:
                                     # Enviar via servidor WebSocket instanciado (se existir)
                                     if getattr(self, 'websocket_server', None) is not None:
                                         try:

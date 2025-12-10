@@ -99,12 +99,28 @@ class TreinamentoAdaptado:
                     resultados = self.utilitarios.maos.process(imagem_rgb)
                     
                     if resultados.multi_hand_landmarks:
-                        # Usar o primeiro marcador de mão
-                        marcos_mao = resultados.multi_hand_landmarks[0]
-                        caracteristicas = self.utilitarios.extrair_caracteristicas(marcos_mao)
+                        # Inicializar placeholders
+                        mao_esquerda = None
+                        mao_direita = None
+
+                        if resultados.multi_handedness:
+                            for idx_mao, handed in enumerate(resultados.multi_handedness):
+                                label = handed.classification[0].label  # "Left" ou "Right"
+                                if label == "Left":
+                                    mao_esquerda = resultados.multi_hand_landmarks[idx_mao]
+                                else:
+                                    mao_direita = resultados.multi_hand_landmarks[idx_mao]
+
+                        # Extrair características
+                        feats_esq = self.utilitarios.extrair_caracteristicas(mao_esquerda) if mao_esquerda else [0]*63
+                        feats_dir = self.utilitarios.extrair_caracteristicas(mao_direita) if mao_direita else [0]*63
+                        
+                        # Combinar (42 pontos → 63 valores por mão)
+                        caracteristicas = feats_esq + feats_dir
+
                         self.dados.append(caracteristicas)
                         self.rotulos.append(classe)
-                        print(f"   ✅ {idx}. {caminho_imagem.name} - OK")
+
                     else:
                         print(f"   ⚠️  {idx}. {caminho_imagem.name} - Mão não detectada")
                         

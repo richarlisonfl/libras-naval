@@ -1,7 +1,24 @@
+import { apiGet, apiPost } from "./api.js";
+
 const WS_URL = 'ws://localhost:8765';
 let ws = null;
 let reconnectInterval = 1000; // 1s
 let coluna = undefined, linha = undefined, acao = undefined;
+
+const linhas = 5;
+const colunas = ["A", "E", "I", "O", "U"];
+let navios = [];
+let nickname = 'bito'
+
+async function carregarMapa() {
+    try {
+        let resposta = await fetch("mapa.json");
+        let dados = await resposta.json();
+        navios = dados.navios;
+    } catch (erro) {
+        alert("Erro ao carregar o mapa.");
+    }
+}
 
 function handleMessage(message){
     const numeros = [1, 2, 3, 4, 5];
@@ -24,6 +41,36 @@ function handleMessage(message){
         linha = undefined;
         acao = undefined;
         return;
+    }
+
+    if (message === 'salvar')
+    {
+        let cells = [];
+        for (let linha = 1; linha <= linhas; linha++) {
+            for (let coluna of colunas) {
+                let id = `cell-${linha}-${coluna}`;
+                let cell = document.getElementById(id);
+                if (cell) {
+                    const navio = navios.includes(id);
+                    const estado = cell.classList.value;
+                    let estadoId;
+                    
+                    if (estado === 'acerto' || estado === 'erro')
+                        estadoId = 1;
+                    else 
+                        estadoId = 2;
+                    
+                    cells.push({
+                        linha: linha,
+                        coluna: coluna,
+                        navio: navio,
+                        estadoId: estadoId
+                    })
+                }
+            }
+        }
+
+        apiPost('/save-game', {nickname, cells})
     }
 
     if (message === 'ok' && coluna != undefined && linha != undefined)
@@ -86,10 +133,6 @@ function connect() {
 // Iniciar conexão imediatamente
 connect();
 
-const linhas = 5;
-const colunas = ["A", "E", "I", "O", "U"];
-
-let navios = [];
 let acertos = 0;
 
 function clicarCelula(event) {
@@ -125,15 +168,6 @@ function ativarTabuleiro() {
     }
 }
 
-async function carregarMapa() {
-    try {
-        let resposta = await fetch("mapa.json");
-        let dados = await resposta.json();
-        navios = dados.navios;
-        ativarTabuleiro();
-    } catch (erro) {
-        alert("Erro ao carregar o mapa.");
-    }
-}
 
 carregarMapa();
+ativarTabuleiro();
