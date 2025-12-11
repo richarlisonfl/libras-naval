@@ -34,7 +34,7 @@ app.post('/save-game', async (req, res) => {
       return;
     }
 
-    const userResult = await context.insertUser(nickname);
+    const userResult = await context.insertUser(nickname, req.body.time);
 
     for (let cell of req.body.cells)
     {

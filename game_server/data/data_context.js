@@ -26,12 +26,12 @@ async function selectAllNickNames() {
     }
 }
 
-async function insertUser(nickname) {
+async function insertUser(nickname, time) {
     const conn = await conectar();
     try {
         const result = await conn.query(
-            'INSERT INTO usuario (apelido) VALUES (?)',
-            [nickname]
+            'INSERT INTO usuario (apelido, tempo) VALUES (?, ?)',
+            [nickname, time]
         );
         return result;
     } catch (error) {
@@ -81,14 +81,15 @@ async function getRank() {
     const conn = await conectar();
     try{
         const [rows] = await conn.query(
-            'select ' +
-            '    u.apelido, ' +
-            '    count(c.id) as total_atingido ' +
+            'select ' + 
+            '    u.apelido,  ' +
+            '    u.tempo,  ' +
+            '    count(c.id) as total_atingido  ' +
             'from celula c  ' +
-            'join usuario u on u.id = c.usuario_id ' + 
-            'where c.navio = true and c.estado_id = 1 ' + 
-            'group by u.apelido ' +
-            'order by 2 desc'
+            'join usuario u on u.id = c.usuario_id  ' + 
+            'where c.navio = true and c.estado_id = 1  ' +
+            'group by u.apelido, u.tempo ' +
+            'order by 3 desc, 2 asc '
         );
         console.log(rows);
         return rows;

@@ -23,9 +23,11 @@ function handleMessage(message){
     if (['a', 'e', 'i', 'o', 'u'].some((v) => v === message))
     {
         coluna = message;
+        document.getElementById("div-coluna").textContent = `Coluna: ${message.toUpperCase()}`;
     } else if ([1, 2, 3, 4, 5].some((v) => v == message))
     {
         linha = message;
+        document.getElementById("div-linha").textContent = `Linha: ${message}`;
     } else if (['ok', 'limpar'].some((v) => v === message))
     {
         acao = message;
@@ -33,6 +35,8 @@ function handleMessage(message){
 
     if (message === 'limpar')
     {
+        document.getElementById("div-coluna").textContent = "Coluna: "
+        document.getElementById("div-linha").textContent = "Linha: "
         coluna = undefined;
         linha = undefined;
         acao = undefined;
@@ -66,7 +70,7 @@ function handleMessage(message){
             }
         }
 
-        apiPost('/save-game', {nickname: localStorage.getItem("apelido"), cells})
+        apiPost('/save-game', {time: formatar(totalSegundos), nickname: localStorage.getItem("apelido"), cells})
 
         finalizarJogoComVitoria();
     }
@@ -81,15 +85,21 @@ function handleMessage(message){
                 cell.classList.add("acerto");
                 acertos++;
                 console.log(`Acerto! ${acertos}/${navios.length} navios`);
-
+                
                 if (acertos === navios.length) {
                     finalizarJogoComVitoria();
                 }
             } else {
                 cell.classList.add("erro");
             }
-        }
 
+            document.getElementById("div-coluna").textContent = "Coluna: "
+            document.getElementById("div-linha").textContent = "Linha: "
+            coluna = undefined;
+            linha = undefined;
+        }
+        
+        document.getElementById("div-navios").textContent = "Acertos: " + `${acertos}/${navios.length}`
         acao = undefined;
     }
 }
@@ -256,4 +266,23 @@ console.log('game.js carregado. Aguardando jogo...');
 
 let span = document.getElementById('apelido-jogador')
 span.innerText = localStorage.getItem('apelido') ?? 'super'
+
+let totalSegundos = 0;
+
+function formatar(seg) {
+    const h = String(Math.floor(seg / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seg % 3600) / 60)).padStart(2, '0');
+    const s = String(seg % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+}
+
+setInterval(() => {
+    totalSegundos++;
+    document.getElementById("div-tempo").textContent = `Tempo: ${formatar(totalSegundos)}`;
+}, 1000);
+
+document.getElementById("div-coluna").textContent = "Coluna: "
+document.getElementById("div-linha").textContent = "Linha: "
+document.getElementById("div-navios").textContent = "Acertos: " + `${acertos}/${navios.length}`
+
 carregarMapa();
