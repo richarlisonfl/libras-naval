@@ -17,7 +17,6 @@ async function selectAllNickNames() {
         const [rows] = await conn.query(
             'select * from apelidos where apelido not in (select apelido from usuario)'
         );
-        console.log(rows);
         return rows;
     } catch (error) {
         console.error('Error fetching nicknames:', error);
@@ -34,7 +33,6 @@ async function insertUser(nickname) {
             'INSERT INTO usuario (apelido) VALUES (?)',
             [nickname]
         );
-        console.log('User inserted:', result[0].insertId);
         return result;
     } catch (error) {
         console.error('Error inserting user:', error);

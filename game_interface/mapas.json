@@ -1,0 +1,24 @@
+{
+    "mapas": [
+        {
+            "id": 1,
+            "navios": ["cell-1-A", "cell-2-E", "cell-3-I", "cell-4-O", "cell-5-U"]
+        },
+        {
+            "id": 2, 
+            "navios": ["cell-5-A", "cell-4-E", "cell-3-I", "cell-2-O", "cell-1-U"]
+        },
+        {
+            "id": 3,
+            "navios": ["cell-1-A", "cell-1-U", "cell-3-I", "cell-5-A", "cell-5-U"]
+        },
+        {
+            "id": 4,
+            "navios": ["cell-1-A", "cell-2-A", "cell-4-E", "cell-5-I", "cell-3-U"]
+        },
+        {
+            "id": 5,
+            "navios": ["cell-3-A", "cell-1-E", "cell-5-I", "cell-2-O", "cell-4-U"]
+        }
+    ]
+}

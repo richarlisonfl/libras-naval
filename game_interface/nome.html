@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libras Naval - Escolha seu Apelido</title>
+    <link rel="stylesheet" href="nome.css">
+    <!-- VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+</head>
+<body>
+    <!-- Widget VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <main class="container-escolha">
+        <section class="area-escolha-nome">
+            <div class="instrucoes-escolha">
+                <h2>Escolha um apelido para iniciar o jogo</h2>
+                <p>Faça o sinal de uma vogal e um número em libras, em seguida o sinal de confirmação e por último o sinal para iniciar jogo.</p>
+            </div>
+            
+            <div class="container-grade-nomes">
+                <div class="grade-wrapper">
+                    <!-- Linha com letras das colunas -->
+                    <div class="linha-colunas">
+                        <div class="espaco-canto"></div> <!-- Espaço para alinhar -->
+                        <div class="letra-coluna">A</div>
+                        <div class="letra-coluna">E</div>
+                        <div class="letra-coluna">I</div>
+                        <div class="letra-coluna">O</div>
+                        <div class="letra-coluna">U</div>
+                    </div>
+                    
+                    <div class="grade-container">
+                        <!-- Coluna com números das linhas -->
+                        <div class="coluna-linhas">
+                            <div class="numero-linha">1</div>
+                            <div class="numero-linha">2</div>
+                            <div class="numero-linha">3</div>
+                            <div class="numero-linha">4</div>
+                            <div class="numero-linha">5</div>
+                        </div>
+                        
+                        <!-- Grade de nomes 5x5 -->
+                        <div class="grade-nomes" id="grade-nomes">
+                            <!-- Conteúdo dinâmico -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="area-confirmacao">
+                <div class="nome-selecionado-container">
+                    <span class="label-nome">Apelido escolhido:</span>
+                    <div class="nome-selecionado" id="nome-selecionado">
+                        Aguardando seleção...
+                    </div>
+                </div>
+                
+                <button class="btn-confirmar" id="btn-confirmar" disabled>
+                    Confirmar e Iniciar Jogo
+                </button>
+                
+                <p class="dica-libras">
+                    Dica: Use vogais (A,E,I,O,U) + números (1-5) via câmera, depois "ok" para selecionar
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="nome.js"></script>
+    <script>
+        // Inicializar VLibras
+        if (typeof VLibras !== 'undefined') {
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+    </script>
+</body>
+</html>

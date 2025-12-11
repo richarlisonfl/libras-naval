@@ -1,0 +1,165 @@
+
+body {
+    font-family: "Google Sans", arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-principal {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cabeçalho igual ao do jogo */
+.conteudo-superior {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.titulo {
+    color: #202124;
+    margin-bottom: 1px;
+    margin-top: 10px;
+}
+
+.descricao-turma {
+    color: #5f6368;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: 0rem;
+    margin: 0;
+}
+
+/* Container do conteúdo principal */
+.container-conteudo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 850px;
+}
+
+/* Cartão de informações */
+.cartao-informacoes {
+    background-color: #81c995;
+    width: 100%;
+    border-radius: 20px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.texto-explicativo {
+    text-align: left;
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: #202124;
+    max-width: 90%;
+    padding-top: 20px;
+}
+
+.texto-explicativo strong {
+    color: #202124;
+}
+
+/* Instrução Libras */
+.instrucao-libras {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border-left: 5px solid #777777;
+    font-size: 1.2rem;
+    color: #5f6368;
+}
+
+.sinal-iloveyou {
+    font-size: 8rem;
+    display: block;
+    margin: 10px 0;
+    text-align: center;
+}
+
+/* Container dos botões */
+.container-botoes {
+    display: flex;
+    /* gap: 0px; */
+    /* margin-top: 10px; */
+}
+
+.btn {
+    background-color: #81c995;
+    color: #202124;
+    border: none;
+    padding: 18px 35px;
+    font-size: 1.4rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-family: "Google Sans", arial, sans-serif;
+}
+
+.btn:hover {
+    background-color: #6ab882;
+    transform: scale(1.05);
+}
+
+.btn-libras {
+    background-color: #8ab4f8;
+}
+
+.btn-libras:hover {
+    background-color: #235483;
+    color: white;
+}
+
+/* Responsividade SIMPLES igual ao jogo */
+/* @media (max-width: 1600px) {
+    .container-principal { transform: scale(0.9); }
+}
+@media (max-width: 1400px) {
+    .container-principal { transform: scale(0.8); }
+    .cartao-informacoes { width: 800px; }
+}
+@media (max-width: 1200px) {
+    .container-principal { transform: scale(0.7); }
+    .cartao-informacoes { width: 700px; }
+}
+@media (max-width: 992px) {
+    .container-principal { transform: scale(0.6); }
+    .cartao-informacoes { width: 600px; }
+    .container-botoes { flex-direction: column; gap: 15px; }
+}
+@media (max-width: 768px) {
+    .container-principal { transform: scale(0.5); }
+    .cartao-informacoes { width: 500px; }
+}
+@media (max-width: 576px) {
+    .container-principal { transform: scale(0.4); }
+    .cartao-informacoes { width: 400px; }
+}
+@media (max-width: 400px) {
+    .container-principal { transform: scale(0.35); }
+    .cartao-informacoes { width: 350px; padding: 20px; }
+} */
+
+/* Para manter proporções em telas muito grandes */
+/* @media (min-width: 2000px) {
+    .container-principal { transform: scale(1.1); }
+}
+@media (min-width: 2400px) {
+    .container-principal { transform: scale(1.2); }
+} */
+/* Vlibras */
+

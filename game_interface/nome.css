@@ -1,0 +1,329 @@
+/* nome.css - Otimizado para 1600x900 sem rolagem */
+
+/* RESET para garantir medidas exatas */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Container principal - TAMANHO FIXO 1600x900 */
+.container-escolha {
+    margin: 0 auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Header - COMPACTO */
+.header-escolha {
+    text-align: center;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.titulo-escolha {
+    color: #202124;
+    font-family: "Google Sans", arial, sans-serif;
+    margin: 0 0 1px 0;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.subtitulo-escolha {
+    color: #5f6368;
+    font-size: 1rem;
+    line-height: 1.2;
+    letter-spacing: 0rem;
+    margin: 0;
+    font-family: "Google Sans", arial, sans-serif;
+}
+
+/* Área principal de escolha - ALTURA CONTROLADA */
+.area-escolha-nome {
+    width: 100%;
+    max-width: 1100px;
+    height: 650px;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Instruções - MÍNIMO */
+.instrucoes-escolha {
+    text-align: center;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.instrucoes-escolha h2 {
+    color: #202124;
+    font-size: 1.6rem;
+    margin: 0 0 5px 0;
+    font-family: "Google Sans", arial, sans-serif;
+    font-weight: normal;
+}
+
+.instrucoes-escolha p {
+    color: #5f6368;
+    font-size: 0.95rem;
+    margin: 0;
+    font-family: "Google Sans", arial, sans-serif;
+}
+
+/* Container da grade com coordenadas */
+.container-grade-nomes {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Grade de nomes 5x5 com coordenadas */
+.grade-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 850px;
+    height: 100%;
+    max-height: 450px;
+    margin: 0 auto;
+}
+
+/* Linha de letras das colunas */
+.linha-colunas {
+    display: grid;
+    grid-template-columns: 50px repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 5px;
+    height: 40px;
+}
+
+.letra-coluna {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Google Sans", arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #202124;
+    background-color: #81c995;
+    border-radius: 8px;
+}
+
+.espaco-canto {
+    /* Espaço vazio para alinhar com números das linhas */
+}
+
+/* Container da grade principal */
+.grade-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Coluna de números das linhas */
+.coluna-linhas {
+    display: flex;
+    flex-direction: column;
+    width: 50px;
+    margin-right: 5px;
+}
+
+.numero-linha {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Google Sans", arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #202124;
+    background-color: #81c995;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.numero-linha:last-child {
+    margin-bottom: 0;
+}
+
+/* Grade de nomes 5x5 */
+.grade-nomes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 10px;
+    flex: 1;
+}
+
+/* Células da grade - COMPACTAS */
+.celula-nome {
+    background-color: #8ab4f8;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 8px 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: "Google Sans", arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #202124;
+    overflow: hidden;
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.1;
+}
+
+.celula-nome:hover {
+    background-color: #235483;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.celula-nome.selecionado {
+    background-color: #ffe28a;
+    border-color: #81c995;
+    color: #202124;
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Área de confirmação - COMPACTA */
+.area-confirmacao {
+    text-align: center;
+    padding-top: 15px;
+    flex-shrink: 0;
+    margin-top: 10px;
+}
+
+.nome-selecionado-container {
+    margin-bottom: 15px;
+}
+
+.label-nome {
+    display: block;
+    color: #5f6368;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    font-family: "Google Sans", arial, sans-serif;
+}
+
+.nome-selecionado {
+    display: inline-block;
+    background-color: #ffe28a;
+    color: #202124;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    font-family: "Google Sans", arial, sans-serif;
+    min-width: 200px;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botão de confirmar - COMPACTO */
+.btn-confirmar {
+    background-color: #81c995;
+    color: #202124;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-family: "Google Sans", arial, sans-serif;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-confirmar:hover:not(:disabled) {
+    background-color: #6ab882;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-confirmar:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-confirmar:disabled {
+    background-color: #cccccc;
+    color: #888888;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Dica Libras - MÍNIMO */
+.dica-libras {
+    color: #5f6368;
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-top: 5px;
+    font-family: "Google Sans", arial, sans-serif;
+}
+
+/* RESPONSIVIDADE - Apenas escala para telas menores */
+@media (max-width: 1600px) {
+}
+
+@media (max-width: 1400px) {
+    .letra-coluna,
+    .numero-linha {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .letra-coluna,
+    .numero-linha {
+        font-size: 1rem;
+    }
+    
+    .linha-colunas {
+        height: 35px;
+    }
+    
+    .coluna-linhas {
+        width: 40px;
+    }
+}
+
+@media (max-width: 992px) {
+    .letra-coluna,
+    .numero-linha {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .letra-coluna,
+    .numero-linha {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+}
