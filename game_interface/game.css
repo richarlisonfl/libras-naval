@@ -172,7 +172,7 @@ table.tabuleiro td:hover {
 .painel-lateral {
     position: fixed; /* Fica fixo na tela */
     top: 20%;
-    left: 0;
+    left: 10px;
     width: 150px; /* Largura do painel */
     height: fit-content; /* Altura total da tela */
     background-color: transparent; /* Cor do painel */

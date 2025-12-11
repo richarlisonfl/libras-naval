@@ -15,7 +15,8 @@ FLUSH PRIVILEGES;
 --############# Creating Tables #############
 create table usuario (
  id int AUTO_INCREMENT primary key,
- apelido varchar(7) not null
+ apelido varchar(7) not null,
+ tempo time default null
 )
 
 create table estado (
