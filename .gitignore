@@ -1,6 +1,51 @@
 # Ambientes virtuais Python
 venv/
+venv_atualizado/
 .env/
 .venv/
 env/
 ENV/
+src/venv_atualizado/
+computer_vision/venv_atualizado/
+computer_vision/.venv
+
+# Cache e compilados Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+
+# Dados e modelos
+computer_vision/data/
+data/generated_model/
+data/to_training/
+computer_vision/data/generated_model/
+computer_vision/data/to_training/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/

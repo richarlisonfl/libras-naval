@@ -1,0 +1,82 @@
+html {
+    font-family: "Google Sans", arial, sans-serif;
+    text-align: center;
+}
+#quadro_b{
+    background-color: #d8d8d8;
+    width: 600px;
+    height: 800px;
+    border-radius: 20px;
+}
+
+.quadro{
+    
+    width: 100px;
+    height: 100px;
+}
+
+
+
+.titulo {
+    color: #202124;
+    font-size: 80px;
+    margin-bottom: 1px;
+}
+
+p {
+    color: #5f6368;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: 0rem;
+}
+
+table.tabuleiro {
+    border-collapse: collapse;
+    margin: 20px auto;
+    font-weight: bold;
+    font-size: 40px;
+
+}
+
+table.tabuleiro th,
+table.tabuleiro td {
+    border: 4px solid #ffffff;
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+}
+
+
+table.tabuleiro thead th,
+table.tabuleiro tbody th {
+    background-color: #81c995;
+    color: #202124;
+}
+
+
+table.tabuleiro td ,#quadro_agua{
+    background-color: #8ab4f8;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+table.tabuleiro td:hover {
+    background-color: #235483;
+}
+
+.erro {
+    background-color: #081a38 !important;
+}
+
+.acerto {
+    background-color: #ff4444 !important;
+}
+
+.navio {
+    background-color: #444444 !important;
+}
+
+.selecionado {
+    background-color: #ffe28a !important;
+}

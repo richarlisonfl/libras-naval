@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libras Naval - Início</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+</head>
+<body>
+    <!-- Widget VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <div class="container-principal">
+        <div class="conteudo-superior">
+            <h1 class="titulo">Libras Naval</h1>
+            <p class="descricao-turma">Jogo desenvolvido pela turma de TADS 2024 - IFPA Campus Paragominas</p>
+        </div>
+
+        <div class="container-conteudo">
+            <div class="cartao-informacoes">
+                <div class="texto-explicativo">
+                    <p>O <strong>Libras Naval</strong> é uma versão acessível do clássico Batalha Naval,
+                    adaptado para o aprendizado de Língua Brasileira de Sinais.</p>
+                    <p>O tabuleiro possui linhas de 1 a 5 e colunas com as vogais A, E, I, O e U.<br>
+                    Seu objetivo é encontrar os navios escondidos realizando jogadas no tabuleiro.</p>
+                </div>
+
+                <div class="instrucao-libras">
+                    <h3 style="color: #202124; margin-top: 0px;margin-bottom: 0px;">Como Iniciar:</h3>
+                    <p>Para começar o jogo, faça o sinal <strong>"I Love You"</strong> para a câmera:</p>
+                    <div class="sinal-iloveyou"></div>
+                    <span>O sistema detectará automaticamente e iniciará o jogo.</span>
+                </div>
+            </div>
+
+            <div class="container-botoes">
+                <!-- Botão apenas informativo -->
+                <button class="btn btn-libras" onclick="iniciarModoLibras()">
+                     Aguardando sinal da câmera...
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // window.addEventListener("load", () => {
+        //     navigator.serviceWorker.register("/ws-sw.js")
+        //         .then(reg => console.log("Service worker registrado", reg))
+        //         .catch(err => console.error("Erro ao registrar SW:", err));
+        // });
+        
+        // Inicializar VLibras Widget
+        if (typeof VLibras !== 'undefined') {
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+        
+        // Espera VLibras carregar e mostra sinal de boas-vindas
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.Libras) {
+                    window.Libras.mostrarSinal('Bem-vindo ao Libras Naval. Faça o sinal I Love You para começar.');
+                }
+            }, 3000); // Dá tempo para VLibras inicializar
+        });
+        
+    </script>
+    <script src="vlibras-sinais.js"></script> <!-- ADICIONE ESTE ARQUIVO -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tabuleiro Batalha Naval</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+    <h1 class="titulo">Libras Naval</h1>
+    <p class="subtitulo">Jogo Desenvolvido pela turma de TADS 2024</p>
+
+    <div class="container-principal">
+        <!-- Legenda no lado esquerdo -->
+        <div class="container-legenda">
+            <div class="legenda-titulo">
+                <h2>Legenda do Jogo</h2>
+            </div>
+
+            <div class="itens-legenda">
+                <div class="item-legenda">
+                    <div class="amostra agua"></div>
+                    <div class="descricao">
+                        <strong>Superfície da Água</strong>
+                        <span>Célula não revelada</span>
+                    </div>
+                </div>
+
+                <div class="item-legenda">
+                    <div class="amostra fundo"></div>
+                    <div class="descricao">
+                        <strong>Fundo do Mar</strong>
+                        <span>Água acertada (erro)</span>
+                    </div>
+                </div>
+
+                <div class="item-legenda">
+                    <div class="amostra acertado"></div>
+                    <div class="descricao">
+                        <strong>Navio Acertado</strong>
+                        <span>Submarino atingido</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-jogo">
+                <h3>Status do Jogo</h3>
+                <div class="estatisticas">
+                    <div class="estatistica">
+                        <div class="numero" id="contador-acertos">0</div>
+                        <div class="rotulo">Acertos</div>
+                    </div>
+                    <div class="estatistica">
+                        <div class="numero" id="contador-erros">0</div>
+                        <div class="rotulo">Erros</div>
+                    </div>
+                    <div class="estatistica">
+                        <div class="numero" id="navios-restantes">5</div>
+                        <div class="rotulo">Navios Restantes</div>
+                    </div>
+                </div>
+
+                <div class="instrucoes">
+                    <h3>Como Jogar</h3>
+                    <p>Clique em uma célula do tabuleiro para atirar.</p>
+                    <p>Tente acertar todos os navios escondidos!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabuleiro no lado direito (MANTIDO IGUAL) -->
+        <div class="container-tabuleiro">
+            <table class="tabuleiro">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>A</th>
+                        <th>E</th>
+                        <th>I</th>
+                        <th>O</th>
+                        <th>U</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td id="cell-1-A"></td>
+                        <td id="cell-1-E"></td>
+                        <td id="cell-1-I"></td>
+                        <td id="cell-1-O"></td>
+                        <td id="cell-1-U"></td>
+                    </tr>
+
+                    <tr>
+                        <th>2</th>
+                        <td id="cell-2-A"></td>
+                        <td id="cell-2-E"></td>
+                        <td id="cell-2-I"></td>
+                        <td id="cell-2-O"></td>
+                        <td id="cell-2-U"></td>
+                    </tr>
+
+                    <tr>
+                        <th>3</th>
+                        <td id="cell-3-A"></td>
+                        <td id="cell-3-E"></td>
+                        <td id="cell-3-I"></td>
+                        <td id="cell-3-O"></td>
+                        <td id="cell-3-U"></td>
+                    </tr>
+
+                    <tr>
+                        <th>4</th>
+                        <td id="cell-4-A"></td>
+                        <td id="cell-4-E"></td>
+                        <td id="cell-4-I"></td>
+                        <td id="cell-4-O"></td>
+                        <td id="cell-4-U"></td>
+                    </tr>
+
+                    <tr>
+                        <th>5</th>
+                        <td id="cell-5-A"></td>
+                        <td id="cell-5-E"></td>
+                        <td id="cell-5-I"></td>
+                        <td id="cell-5-O"></td>
+                        <td id="cell-5-U"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Mensagem de status -->
+            <div class="mensagem-status" id="mensagem-status">
+                Clique em uma célula para começar!
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="game.js"></script>
+
+</html>

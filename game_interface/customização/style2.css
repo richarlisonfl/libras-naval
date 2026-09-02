@@ -1,0 +1,301 @@
+html {
+    font-family: "Google Sans", arial, sans-serif;
+    text-align: center;
+    background-color: #f0f8ff;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #e6f7ff, #cceeff);
+}
+
+.titulo {
+    color: #202124;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitulo {
+    color: #5f6368;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: 0rem;
+    margin-bottom: 2rem;
+}
+
+/* Container principal - lado a lado */
+.container-principal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Legenda (lado esquerdo) - mais compacta */
+.container-legenda {
+    width: 300px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.legenda-titulo h2 {
+    color: #202124;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #81c995;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.itens-legenda {
+    margin-bottom: 25px;
+}
+
+.item-legenda {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.item-legenda:hover {
+    background-color: #f5f5f5;
+}
+
+.amostra {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.descricao {
+    display: flex;
+    flex-direction: column;
+}
+
+.descricao strong {
+    color: #202124;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+}
+
+.descricao span {
+    color: #5f6368;
+    font-size: 0.85rem;
+}
+
+/* Cores da legenda - APENAS AS QUE SÃO USADAS */
+.agua {
+    background-color: #8ab4f8;
+}
+
+.fundo {
+    background-color: #081a38;
+}
+
+/* REMOVIDA: .navio (não é usada no jogo) */
+
+.acertado {
+    background-color: #ff4444;
+}
+
+/* Informações do jogo */
+.info-jogo {
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.info-jogo h3 {
+    color: #202124;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.estatisticas {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.estatistica {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 8px;
+}
+
+.numero {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #1a73e8;
+    margin-bottom: 5px;
+}
+
+.rotulo {
+    font-size: 0.8rem;
+    color: #5f6368;
+    text-align: center;
+}
+
+.instrucoes {
+    background-color: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+.instrucoes h3 {
+    color: #202124;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.instrucoes p {
+    margin: 5px 0;
+    color: #5f6368;
+    font-size: 0.85rem;
+}
+
+/* Container do tabuleiro (lado direito) */
+.container-tabuleiro {
+    flex: 1;
+    min-width: 350px;
+    max-width: 600px;
+}
+
+/* TABULEIRO - MANTIDO EXATAMENTE IGUAL AO ORIGINAL */
+table.tabuleiro {
+    border-collapse: collapse;
+    margin: 20px auto;
+    font-weight: bold;
+    font-size: 40px;
+}
+
+table.tabuleiro th,
+table.tabuleiro td {
+    border: 4px solid #ffffff;
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+}
+
+table.tabuleiro thead th,
+table.tabuleiro tbody th {
+    background-color: #81c995;
+    color: #202124;
+}
+
+table.tabuleiro td {
+    background-color: #8ab4f8;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+table.tabuleiro td:hover {
+    background-color: #235483;
+}
+
+/* Classes do jogo - APENAS AS QUE SÃO USADAS */
+.erro {
+    background-color: #081a38 !important;
+}
+
+.acerto {
+    background-color: #ff4444 !important;
+}
+
+/* REMOVIDAS:
+.navio {
+    background-color: #444444 !important;
+}
+
+.selecionado {
+    background-color: #ffe28a !important;
+}
+*/
+
+/* Mensagem de status */
+.mensagem-status {
+    background-color: #ffffff;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #202124;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container-principal {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .container-legenda {
+        width: 100%;
+        max-width: 350px;
+    }
+    
+    .container-tabuleiro {
+        width: 100%;
+    }
+    
+    table.tabuleiro th,
+    table.tabuleiro td {
+        width: 70px;
+        height: 70px;
+        font-size: 30px;
+    }
+    
+    .titulo {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    table.tabuleiro th,
+    table.tabuleiro td {
+        width: 55px;
+        height: 55px;
+        font-size: 24px;
+    }
+    
+    .amostra {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .numero {
+        font-size: 1.5rem;
+    }
+}
