@@ -1,12 +1,12 @@
 $ErrorActionPreference = 'Stop'
 
 $baseDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$computerVisionDir = Join-Path $baseDir 'computer_vision'
-$venvDir = Join-Path $computerVisionDir '.venv'
+$detectionSystemDir = Join-Path $baseDir 'detection_system'
+$venvDir = Join-Path $detectionSystemDir '.venv'
 $pythonPath = Join-Path $venvDir 'Scripts\python.exe'
-$requirementsPath = Join-Path $computerVisionDir 'requirements.txt'
+$requirementsPath = Join-Path $detectionSystemDir 'requirements.txt'
 $serverDir = Join-Path $baseDir 'game_server'
-$recognitionScript = Join-Path $computerVisionDir 'src\reconhecimento_app.py'
+$recognitionScript = Join-Path $detectionSystemDir 'src\reconhecimento_app.py'
 
 function Get-Python311 {
     $python = Get-Command py -ErrorAction SilentlyContinue

@@ -22,9 +22,8 @@ Não substitua essa versão por `mediapipe 1.x` sem adaptar o código de detecç
 
 ```text
 libras-naval/
-├── computer_vision/
+├── detection_system/
 │   ├── .venv/                  # Ambiente Python principal
-│   ├── venv_atualizado/        # Ambiente opcional para testes
 │   ├── main.py                 # Menu principal
 │   ├── config.py               # Configurações e caminhos
 │   ├── requirements.txt        # Dependências Python
@@ -56,7 +55,7 @@ chmod +x linux_start_game.sh
 O script:
 
 1. Verifica se o Python 3.11 está disponível.
-2. Cria `computer_vision/.venv` caso necessário.
+2. Cria `detection_system/.venv` caso necessário.
 3. Instala as dependências Python.
 4. Instala as dependências do servidor Node.js.
 5. Inicia o servidor e o reconhecimento.
@@ -66,7 +65,7 @@ Se o Python 3.11 não estiver instalado, o script tenta instalá-lo usando `sudo
 ## Execução manual Linux
 
 ```bash
-cd computer_vision
+cd detection_system
 source .venv/bin/activate
 python main.py
 ```
@@ -74,11 +73,11 @@ python main.py
 Também é possível executar sem ativar o ambiente:
 
 ```bash
-cd computer_vision
+cd detection_system
 .venv/bin/python main.py
 ```
 
-Não execute `python main.py` na raiz do projeto, pois o arquivo está dentro de `computer_vision`.
+Não execute `python main.py` na raiz do projeto, pois o arquivo está dentro de `detection_system`.
 
 ## Instalação e execução Windows
 
@@ -89,13 +88,13 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\windows_start_game.ps1
 ```
 
-O script usa o launcher `py -3.11` quando disponível, cria `computer_vision\\.venv`, instala as dependências, inicia o servidor em `game_server` e executa `src\\reconhecimento_app.py`.
+O script usa o launcher `py -3.11` quando disponível, cria `detection_system\\.venv`, instala as dependências, inicia o servidor em `game_server` e executa `src\\reconhecimento_app.py`.
 
 PowerShell é necessário porque o arquivo possui extensão `.ps1` e usa comandos próprios dessa linguagem.
 
 ## Menu principal
 
-O arquivo `computer_vision/main.py` oferece:
+O arquivo `detection_system/main.py` oferece:
 
 1. Reconhecimento em tempo real
 2. Treinamento
@@ -108,7 +107,7 @@ O arquivo `computer_vision/main.py` oferece:
 Para testar a sintaxe e as dependências principais:
 
 ```bash
-cd computer_vision
+cd detection_system
 .venv/bin/python -m py_compile main.py config.py src/*.py src/sistema_libras/*.py
 .venv/bin/python -c "import cv2, mediapipe, websockets; print('Dependências principais OK')"
 ```
@@ -126,13 +125,13 @@ Mensagens do OpenCV informando que índices inexistentes não puderam ser aberto
 Crie uma pasta para cada classe dentro de:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ```
 
 Exemplo:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ├── 1/
 ├── 2/
 └── 3/
@@ -187,7 +186,7 @@ São necessárias pelo menos duas classes e pelo menos duas amostras por classe.
 O modelo é salvo em:
 
 ```text
-computer_vision/data/generated_model/modelo_libras.pkl
+detection_system/data/generated_model/modelo_libras.pkl
 ```
 
 Esse arquivo contém:
@@ -232,7 +231,7 @@ O reconhecimento tenta iniciar um servidor WebSocket local na porta `8765`. A in
 Selecione o interpretador correto:
 
 ```text
-computer_vision/.venv/bin/python
+detection_system/.venv/bin/python
 ```
 
 No VS Code: `Ctrl+Shift+P` -> `Python: Select Interpreter`.
@@ -242,7 +241,7 @@ No VS Code: `Ctrl+Shift+P` -> `Python: Select Interpreter`.
 Use o ambiente do projeto:
 
 ```bash
-cd computer_vision
+cd detection_system
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
@@ -260,7 +259,7 @@ python -m pip install --force-reinstall mediapipe==0.10.14
 Verifique se existem subpastas dentro de:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ```
 
 ### Modelo não encontrado
@@ -268,7 +267,7 @@ computer_vision/data/to_training/
 Treine o modelo antes de escolher o reconhecimento. O arquivo esperado é:
 
 ```text
-computer_vision/data/generated_model/modelo_libras.pkl
+detection_system/data/generated_model/modelo_libras.pkl
 ```
 
 ### O script não encontra um arquivo
@@ -276,7 +275,7 @@ computer_vision/data/generated_model/modelo_libras.pkl
 Execute os comandos a partir da raiz indicada no próprio comando. Para o menu Python:
 
 ```bash
-cd computer_vision
+cd detection_system
 python main.py
 ```
 

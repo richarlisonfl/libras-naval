@@ -3,8 +3,8 @@
 # Caminho base do script (resolvido para caminho absoluto)
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Ambiente virtual único do componente Python
-VENV_DIR="$BASE_DIR/computer_vision/.venv"
-REQ_FILE="$BASE_DIR/computer_vision/requirements.txt"
+VENV_DIR="$BASE_DIR/detection_system/.venv"
+REQ_FILE="$BASE_DIR/detection_system/requirements.txt"
 
 ###############################################
 # Instalar Python 3.11 caso não exista
@@ -127,11 +127,11 @@ cd "$BASE_DIR" || exit 1
 echo "Iniciando script de reconhecimento..."
 # Use o python do venv para garantir as dependências corretas
 if [ -x "$VENV_DIR/bin/python" ]; then
-    "$VENV_DIR/bin/python" computer_vision/src/reconhecimento_app.py &
+    "$VENV_DIR/bin/python" detection_system/src/reconhecimento_app.py &
     RECON_PID=$!
 else
     # fallback para python3.11 do sistema
-    python3.11 computer_vision/src/reconhecimento_app.py &
+    python3.11 detection_system/src/reconhecimento_app.py &
     RECON_PID=$!
 fi
 echo "Reconhecimento PID: $RECON_PID"

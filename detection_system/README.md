@@ -171,9 +171,14 @@ pip install -r requirements.txt
 
 Dependências necessárias:
 - `opencv-python`: Processamento de imagens
-- `mediapipe`: Detecção de landmarks das mãos
+- `mediapipe`: Detecção de landmarks das mãos pela API Tasks
 - `scikit-learn`: Classificação de dados
 - `numpy`: Operações numéricas
+
+O primeiro uso do sistema baixa automaticamente o arquivo `hand_landmarker.task`
+para `models/`. Para usar um arquivo já baixado, defina
+`MEDIAPIPE_HAND_LANDMARKER_MODEL` com o caminho completo do modelo antes de
+executar o sistema.
 
 ### Arquivo de Configuração (config.py)
 
