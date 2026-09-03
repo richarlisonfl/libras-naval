@@ -141,19 +141,26 @@ Verifica se a câmera e o MediaPipe estão funcionando corretamente.
 ```
 libras-naval/
 ├── main.py                              # Menu principal
-├── capturador_imagens.py                # Capturador de imagens por classe
-├── src/treinamento_app.py               # Treinamento
-├── src/reconhecimento_app.py            # Reconhecimento
-├── teste_rapido.py                      # Teste de setup
 ├── config.py                            # Configurações globais
 ├── requirements.txt                     # Dependências
-├── sistema_libras/
-│   ├── __init__.py
-│   ├── coletor_dados.py                 # Coleta de dados da câmera
-│   ├── classificador.py                 # Classificador ML
-│   ├── reconhecedor.py                  # Engine de reconhecimento
-│   ├── utilitarios.py                   # Funções auxiliares
-│   └── treinamento_incremental.py       # Treinamento incremental
+└── src/
+   ├── apps/
+   │   ├── capturador_imagens.py        # Captura de imagens
+   │   ├── treinamento_app.py           # Treinamento
+   │   └── reconhecimento_app.py        # Reconhecimento
+   ├── core/
+   │   ├── camera.py                    # Acesso à câmera
+   │   ├── detector_maos.py             # Detecção e landmarks
+   │   ├── classificador.py             # Classificador ML
+   │   └── coletor_dados.py             # Coleta de características
+   ├── services/
+   │   ├── reconhecedor.py              # Reconhecimento em tempo real
+   │   ├── treinamento_incremental.py   # Treinamento incremental
+   │   └── websocket.py                 # Comunicação WebSocket
+   └── tools/
+      ├── teste_rapido.py              # Teste de setup
+      ├── validar_sistema.py           # Validação completa
+      └── verificar_sistema.py         # Verificação rápida
 ├── data/
 │   ├── to_training/                     # Imagens (ignoradas pelo Git)
 │   └── generated_model/                 # Artefatos versionáveis
@@ -207,39 +214,39 @@ CONFIG = {
 #### Capturar Imagens para Treinamento
 
 ```bash
-python capturador_imagens.py --camera 0
+python src/apps/capturador_imagens.py --camera 0
 ```
 
 #### Treinamento com Webcam
 
 ```bash
-python src/treinamento_app.py --camera 0 --modo webcam
+python src/apps/treinamento_app.py --camera 0 --modo webcam
 ```
 
 #### Treinamento com Pastas
 
 ```bash
-python src/treinamento_app.py --camera 0 --modo pastas --caminho data/to_training
+python src/apps/treinamento_app.py --camera 0 --modo pastas --caminho data/to_training
 ```
 
 #### Reconhecimento
 
 ```bash
-python src/reconhecimento_app.py --camera 0
+python src/apps/reconhecimento_app.py --camera 0
 ```
 
 ### Parâmetros de Linha de Comando
 
-**capturador_imagens.py:**
+**src/apps/capturador_imagens.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
 - `--caminho CAMINHO`: Caminho para pasta de classes (padrão: data/to_training)
 
-**src/treinamento_app.py:**
+**src/apps/treinamento_app.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
 - `--modo [webcam|pastas]`: Modo de treinamento (padrão: webcam)
 - `--caminho CAMINHO`: Caminho para pasta de imagens (padrão: data/to_training)
 
-**src/reconhecimento_app.py:**
+**src/apps/reconhecimento_app.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
 
 ## 📊 Fluxo de Funcionamento

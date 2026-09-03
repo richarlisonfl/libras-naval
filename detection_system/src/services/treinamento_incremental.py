@@ -1,7 +1,7 @@
 import os
 import numpy as np
-from .coletor_dados import ColetorDadosLibras
-from .classificador import ClassificadorLibras
+from src.core.coletor_dados import ColetorDadosLibras
+from src.core.classificador import ClassificadorLibras
 import config
 
 class TreinamentoIncremental:

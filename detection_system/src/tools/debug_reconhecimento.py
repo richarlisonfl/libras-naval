@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 import config
-from sistema_libras.utilitarios import UtilitariosMaos
+from src.core.detector_maos import DetectorMaos
 
 print(" Debug - Testando componente por componente...")
 
@@ -28,8 +28,8 @@ cap.release()
 # 2. Testar MediaPipe
 print("2. Testando MediaPipe...")
 try:
-    utilitarios = UtilitariosMaos()
-    resultado = utilitarios.maos.process(np.zeros((64, 64, 3), dtype=np.uint8))
+    detector = DetectorMaos()
+    resultado = detector.maos.process(np.zeros((64, 64, 3), dtype=np.uint8))
     print(" MediaPipe OK")
 except Exception as e:
     print(f" MediaPipe falhou: {e}")

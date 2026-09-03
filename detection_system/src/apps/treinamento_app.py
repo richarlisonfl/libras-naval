@@ -14,30 +14,30 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-# Adicionar o diretório atual ao path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Permite execução direta pelo terminal.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from sistema_libras.classificador import ClassificadorLibras
-from sistema_libras.utilitarios import UtilitariosMaos
+from src.core.classificador import ClassificadorLibras
+from src.core.detector_maos import DetectorMaos
 import config
 
 
 class TreinamentoAdaptado:
     """Classe para gerenciar treinamento adaptado"""
-    
+
     def __init__(self, indice_camera=0):
         self.indice_camera = indice_camera
-        self.utilitarios = UtilitariosMaos()
+        self.utilitarios = DetectorMaos()
         self.dados = []
         self.rotulos = []
         self.grupos = []
-    
+
     def treinar_com_webcam(self, classes, amostras_por_classe=5):
         """Treina utilizando webcam com índice configurável"""
         print(f"\n Treinando com webcam (índice {self.indice_camera}): {classes}")
         print(f" Amostras por classe: {amostras_por_classe}")
         print("-" * 60)
-        
+
         config_original = config.CONFIG['numero_amostras_por_classe']
         config.CONFIG['numero_amostras_por_classe'] = amostras_por_classe
 
@@ -56,42 +56,42 @@ class TreinamentoAdaptado:
             return self._treinar_modelo()
         finally:
             config.CONFIG['numero_amostras_por_classe'] = config_original
-    
-    def treinar_com_pastas(self, caminho_pastas):       
+
+    def treinar_com_pastas(self, caminho_pastas):
         caminho_base = Path(caminho_pastas)
-        
+
         classes = [d.name for d in caminho_base.iterdir() if d.is_dir()]
-        
+
         if not classes:
             print(f" Nenhuma pasta encontrada em: {caminho_pastas}")
             return False
-        
+
         print(f" Classes encontradas: {classes}")
         print(f" Total: {len(classes)} classes")
         print("-" * 60)
-        
+
         for classe in sorted(classes):
             pasta_classe = caminho_base / classe
             imagens = list(pasta_classe.glob("*.jpg")) + list(pasta_classe.glob("*.png")) + list(pasta_classe.glob("*.jpeg"))
-            
+
             if not imagens:
                 print(f"  Nenhuma imagem encontrada em {classe}, pulando...")
                 continue
-            
+
             print(f"\n Classe: {classe}")
             print(f" Imagens encontradas: {len(imagens)}")
-            
+
             for idx, caminho_imagem in enumerate(imagens, 1):
                 try:
                     imagem = cv2.imread(str(caminho_imagem))
                     if imagem is None:
                         print(f"     Não foi possível ler: {caminho_imagem.name}")
                         continue
-                    
+
                     #imagem = cv2.flip(imagem, 1)
                     imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
                     resultados = self.utilitarios.maos.process(imagem_rgb)
-                    
+
                     if resultados.multi_hand_landmarks:
                         # Usar o primeiro marcador de mão
                         marcos_mao = resultados.multi_hand_landmarks[0]
@@ -103,7 +103,7 @@ class TreinamentoAdaptado:
 
                     else:
                         print(f"     {idx}. {caminho_imagem.name} - Mão não detectada")
-                        
+
                 except Exception as e:
                     print(f"    {idx}. {caminho_imagem.name} - Erro: {e}")
 
@@ -114,11 +114,11 @@ class TreinamentoAdaptado:
                     if imagem is None:
                         print(f"     Não foi possível ler: {caminho_imagem.name}")
                         continue
-                    
+
                     imagem = cv2.flip(imagem, 1)
                     imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
                     resultados = self.utilitarios.maos.process(imagem_rgb)
-                    
+
                     if resultados.multi_hand_landmarks:
                         # Usar o primeiro marcador de mão
                         marcos_mao = resultados.multi_hand_landmarks[0]
@@ -129,58 +129,58 @@ class TreinamentoAdaptado:
                         print(f"    {idx}. {caminho_imagem.name} - OK")
                     else:
                         print(f"     {idx}. {caminho_imagem.name} - Mão não detectada")
-                        
+
                 except Exception as e:
                     print(f"    {idx}. {caminho_imagem.name} - Erro: {e}")
-        
+
         return self._treinar_modelo()
-    
+
     def _coletar_classe_webcam(self, classe, amostras_por_classe):
         """Coleta amostras para uma classe via webcam"""
         contador_amostras = 0
-        
+
         camera = cv2.VideoCapture(self.indice_camera)
-        
+
         if not camera.isOpened():
             print(f" Não foi possível abrir a câmera com índice {self.indice_camera}")
             return False
-        
+
         camera.set(cv2.CAP_PROP_FRAME_WIDTH, config.CONFIG['dimensao_imagem'][0])
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CONFIG['dimensao_imagem'][1])
-        
+
         while contador_amostras < amostras_por_classe:
             sucesso, quadro = camera.read()
             if not sucesso:
                 print(" Erro ao capturar da câmera")
                 camera.release()
                 return False
-            
+
             quadro = cv2.flip(quadro, 1)
             quadro_rgb = cv2.cvtColor(quadro, cv2.COLOR_BGR2RGB)
             resultados = self.utilitarios.maos.process(quadro_rgb)
-            
+
             # Interface de coleta
-            cv2.putText(quadro, f"CLASSE: {classe}", (20, 40), 
+            cv2.putText(quadro, f"CLASSE: {classe}", (20, 40),
                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(quadro, f"AMOSTRAS: {contador_amostras}/{amostras_por_classe}", 
+            cv2.putText(quadro, f"AMOSTRAS: {contador_amostras}/{amostras_por_classe}",
                        (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(quadro, "ESPACO: Capturar | 's': Pular | 'q': Sair", 
+            cv2.putText(quadro, "ESPACO: Capturar | 's': Pular | 'q': Sair",
                        (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            
+
             mao_detectada = False
             if resultados.multi_hand_landmarks:
                 mao_detectada = True
                 for marcos_mao in resultados.multi_hand_landmarks:
                     self.utilitarios.desenhar_landmarks(quadro, marcos_mao)
-            
+
             # Feedback visual
             cor_feedback = (0, 255, 0) if mao_detectada else (0, 0, 255)
             texto_feedback = "MAO DETECTADA - PRONTO" if mao_detectada else "AGUARDANDO MAO"
-            cv2.putText(quadro, texto_feedback, (20, 450), 
+            cv2.putText(quadro, texto_feedback, (20, 450),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_feedback, 2)
-            
+
             cv2.imshow("Coletor de Dados - Libras", quadro)
-            
+
             tecla = cv2.waitKey(1) & 0xFF
             if tecla == ord(' ') and mao_detectada:  # Espaço para capturar
                 caracteristicas = self.utilitarios.extrair_caracteristicas(resultados.multi_hand_landmarks[0])
@@ -196,23 +196,23 @@ class TreinamentoAdaptado:
                 camera.release()
                 cv2.destroyAllWindows()
                 return False
-        
+
         camera.release()
         cv2.destroyAllWindows()
         return True
-    
+
     def _treinar_modelo(self):
         """Treina o modelo com os dados coletados"""
         if len(self.dados) == 0:
             print(" Nenhum dado coletado para treinamento")
             return False
-        
+
         print(f"\n Treinando modelo com {len(self.dados)} amostras...")
         print(f" Classes: {set(self.rotulos)}")
         print("-" * 60)
-        
+
         classificador = ClassificadorLibras()
-        
+
         try:
             start_time = time.perf_counter()
             precisao = classificador.treinar(
@@ -221,11 +221,11 @@ class TreinamentoAdaptado:
                 grupos=self.grupos if self.grupos else None,
             )
             duracao_treinamento = time.perf_counter() - start_time
-            
+
             print(f" Modelo treinado com sucesso!")
             print(f" Precisão: {precisao:.3%}")
             print(f" Tempo de treinamento: {duracao_treinamento:.2f}s")
-            
+
             classificador.salvar_dados_treinamento(
                 self.dados,
                 self.rotulos,
@@ -233,7 +233,7 @@ class TreinamentoAdaptado:
             )
             classificador.salvar_modelo()
             print(f" Modelo salvo!")
-            
+
             return True
         except Exception as e:
             print(f" Erro ao treinar modelo: {e}")
@@ -245,7 +245,7 @@ class TreinamentoAdaptado:
 def parse_args():
     """Parse de argumentos da linha de comando"""
     parser = argparse.ArgumentParser(description='Treinamento de LIBRAS - versão adaptada')
-    
+
     parser.add_argument('--camera', type=int, default=0, help='Índice da câmera (padrão: 0)')
     parser.add_argument('--modo', choices=['webcam', 'pastas'], default='webcam', help='Modo de treinamento')
     parser.add_argument(
@@ -254,7 +254,7 @@ def parse_args():
         default=config.CONFIG['caminho_dados'],
         help='Caminho das pastas para treinamento',
     )
-    
+
     return parser.parse_args()
 
 class TreinamentoApp:

@@ -115,7 +115,7 @@ cd "$BASE_DIR" || exit 1
 
 echo "Iniciando script de reconhecimento..."
 # Use o python do venv para garantir as dependências corretas
-"$VENV_DIR/bin/python" detection_system/src/reconhecimento_app.py &
+"$VENV_DIR/bin/python" detection_system/src/apps/reconhecimento_app.py &
 RECON_PID=$!
 echo "Reconhecimento PID: $RECON_PID"
 

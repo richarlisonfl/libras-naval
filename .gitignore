@@ -20,7 +20,7 @@ __pycache__/
 # Dados e modelos
 detection_system/data/*
 !detection_system/data/generated_model/
-!detection_system/data/generated_model/*
+detection_system/data/generated_model/*
 !detection_system/data/generated_model/modelo_libras.pkl
 !detection_system/data/generated_model/dados_libras.npz
 

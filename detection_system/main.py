@@ -13,11 +13,11 @@ if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
 
 import config
-from src.camera import Camera
-from src.capturador_imagens import CapturadorImagens
-from src.reconhecimento_app import ReconhecimentoApp
-from src.treinamento_app import TreinamentoApp
-from src.sistema_libras.treinamento_incremental import TreinamentoIncremental
+from src.core.camera import Camera
+from src.apps.capturador_imagens import CapturadorImagens
+from src.apps.reconhecimento_app import ReconhecimentoApp
+from src.apps.treinamento_app import TreinamentoApp
+from src.services.treinamento_incremental import TreinamentoIncremental
 
 
 def limpar_tela():
@@ -150,7 +150,7 @@ def executar_teste_setup():
     
     try:
         resultado = subprocess.run(
-            [sys.executable, os.path.join(BASE_DIR, 'src', 'teste_rapido.py')],
+            [sys.executable, os.path.join(BASE_DIR, 'src', 'tools', 'teste_rapido.py')],
             cwd=BASE_DIR,
             check=False,
         )

@@ -10,7 +10,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 
-class UtilitariosMaos:
+class DetectorMaos:
     MODELO_URL = (
         "https://storage.googleapis.com/mediapipe-models/hand_landmarker/"
         "hand_landmarker/float16/1/hand_landmarker.task"
@@ -73,6 +73,26 @@ class UtilitariosMaos:
         caracteristicas.extend(self._calcular_angulos(marcos_mao))
         return np.array(caracteristicas, dtype=float)
 
+    def estimar_orientacao(self, marcos_mao):
+        """Estima se a palma ou as costas da mão estão voltadas para a câmera."""
+        pontos = marcos_mao.landmark
+        pulso = np.array([pontos[0].x, pontos[0].y, pontos[0].z])
+        base_indicador = np.array([pontos[5].x, pontos[5].y, pontos[5].z])
+        base_mindinho = np.array([pontos[17].x, pontos[17].y, pontos[17].z])
+
+        normal = np.cross(base_indicador - pulso, base_mindinho - pulso)
+        tamanho_normal = np.linalg.norm(normal)
+        if tamanho_normal < 1e-8:
+            return "INDEFINIDA", 0.0
+
+        componente_camera = normal[2] / tamanho_normal
+        confianca = min(abs(componente_camera), 1.0)
+        if confianca < 0.25:
+            return "INDEFINIDA", confianca
+
+        orientacao = "PALMA" if componente_camera < 0 else "COSTAS"
+        return orientacao, confianca
+
     def _calcular_angulos(self, marcos_mao):
         """Calcula os ângulos definidos entre os pontos dos dedos."""
         pontos = marcos_mao.landmark
@@ -125,5 +145,19 @@ class _ProcessadorMaos:
             multi_hand_landmarks=[
                 SimpleNamespace(landmark=landmarks)
                 for landmarks in resultado.hand_landmarks
-            ]
+            ],
+            multi_handedness=[
+                [
+                    SimpleNamespace(
+                        category_name=classificacao.category_name,
+                        score=classificacao.score,
+                    )
+                    for classificacao in classificacoes
+                ]
+                for classificacoes in resultado.handedness
+            ],
+            multi_hand_world_landmarks=[
+                SimpleNamespace(landmark=landmarks)
+                for landmarks in resultado.hand_world_landmarks
+            ],
         )

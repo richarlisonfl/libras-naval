@@ -5,6 +5,11 @@ Verifica se todo o sistema está configurado corretamente
 
 import os
 import sys
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 import config
 
 print(" VERIFICANDO SISTEMA...")
@@ -12,18 +17,19 @@ print("=" * 50)
 
 # Verificar arquivos necessários
 arquivos_necessarios = [
-    'sistema_libras/__init__.py',
-    'sistema_libras/coletor_dados.py',
-    'sistema_libras/classificador.py',
-    'sistema_libras/reconhecedor.py',
-    'sistema_libras/utilitarios.py',
+    'src/core/__init__.py',
+    'src/core/coletor_dados.py',
+    'src/core/classificador.py',
+    'src/services/reconhecedor.py',
+    'src/core/detector_maos.py',
     'config.py',
-    'main_reconhecimento.py'
+    'src/apps/reconhecimento_app.py'
 ]
 
 print(" Verificando arquivos...")
 for arquivo in arquivos_necessarios:
-    if os.path.exists(arquivo):
+    caminho_arquivo = os.path.join(BASE_DIR, arquivo)
+    if os.path.exists(caminho_arquivo):
         print(f" {arquivo}")
     else:
         print(f" {arquivo} - FALTANDO!")
@@ -32,10 +38,10 @@ for arquivo in arquivos_necessarios:
 print("\n Verificando modelo treinado...")
 if os.path.exists(os.path.join(config.CONFIG['caminho_modelos'], 'modelo_libras.pkl')):
     print(" Modelo treinado encontrado!")
-    print(" Pode executar: python main_reconhecimento.py")
+    print(" Pode executar: python src/apps/reconhecimento_app.py")
 else:
     print(" Modelo não encontrado.")
-    print(" Execute primeiro: python main_treinamento_facil.py")
+    print(" Execute primeiro: python src/apps/treinamento_app.py")
 
 # Verificar dependências
 print("\n Verificando dependências...")

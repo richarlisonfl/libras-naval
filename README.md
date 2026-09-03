@@ -35,7 +35,10 @@ libras-naval/
 │       ├── capturador_imagens.py
 │       ├── reconhecimento_app.py
 │       ├── treinamento_app.py
-│       └── sistema_libras/
+│       ├── apps/
+│       ├── core/
+│       ├── services/
+│       └── tools/
 ├── game_interface/             # Interface do jogo
 ├── game_server/                # Servidor Node.js
 ├── linux_start_game.sh         # Inicializador Linux
@@ -108,7 +111,7 @@ Para testar a sintaxe e as dependências principais:
 
 ```bash
 cd detection_system
-.venv/bin/python -m py_compile main.py config.py src/*.py src/sistema_libras/*.py
+.venv/bin/python -m py_compile main.py config.py src/*.py src/**/*.py
 .venv/bin/python -c "import cv2, mediapipe, websockets; print('Dependências principais OK')"
 ```
 
