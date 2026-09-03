@@ -73,7 +73,7 @@ class DetectorMaos:
         caracteristicas.extend(self._calcular_angulos(marcos_mao))
         return np.array(caracteristicas, dtype=float)
 
-    def estimar_orientacao(self, marcos_mao):
+    def estimar_orientacao(self, marcos_mao, lado=None):
         """Estima se a palma ou as costas da mão estão voltadas para a câmera."""
         pontos = marcos_mao.landmark
         pulso = np.array([pontos[0].x, pontos[0].y, pontos[0].z])
@@ -90,8 +90,19 @@ class DetectorMaos:
         if confianca < 0.25:
             return "INDEFINIDA", confianca
 
-        orientacao = "PALMA" if componente_camera < 0 else "COSTAS"
+        orientacao = "COSTAS" if componente_camera < 0 else "PALMA"
+        if lado == "Left":
+            orientacao = "PALMA" if orientacao == "COSTAS" else "COSTAS"
         return orientacao, confianca
+
+    @staticmethod
+    def corrigir_lado(lado):
+        """Converte o lado retornado para a convenção física da câmera."""
+        if lado == "Left":
+            return "Right"
+        if lado == "Right":
+            return "Left"
+        return lado
 
     def _calcular_angulos(self, marcos_mao):
         """Calcula os ângulos definidos entre os pontos dos dedos."""
@@ -149,7 +160,9 @@ class _ProcessadorMaos:
             multi_handedness=[
                 [
                     SimpleNamespace(
-                        category_name=classificacao.category_name,
+                        category_name=DetectorMaos.corrigir_lado(
+                            classificacao.category_name
+                        ),
                         score=classificacao.score,
                     )
                     for classificacao in classificacoes

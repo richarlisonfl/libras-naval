@@ -38,7 +38,12 @@ def desenhar_informacoes(imagem, resultados, detector, tempo_ms, fps):
 
     for indice, marcos_mao in enumerate(resultados.multi_hand_landmarks):
         detector.desenhar_landmarks(imagem, marcos_mao)
-        orientacao, confianca_orientacao = detector.estimar_orientacao(marcos_mao)
+        lado = None
+        if indice < len(resultados.multi_handedness):
+            lado = resultados.multi_handedness[indice][0].category_name
+        orientacao, confianca_orientacao = detector.estimar_orientacao(
+            marcos_mao, lado
+        )
         texto_orientacao = (
             f"Orientacao {indice + 1}: {orientacao} "
             f"({confianca_orientacao:.0%})"
