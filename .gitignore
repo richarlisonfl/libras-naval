@@ -5,9 +5,8 @@ venv_atualizado/
 .venv/
 env/
 ENV/
-src/venv_atualizado/
-computer_vision/venv_atualizado/
-computer_vision/.venv
+detection_system/.venv/
+detection_system/models/
 
 # Cache e compilados Python
 __pycache__/
@@ -19,11 +18,11 @@ __pycache__/
 .eggs/
 
 # Dados e modelos
-computer_vision/data/
-data/generated_model/
-data/to_training/
-computer_vision/data/generated_model/
-computer_vision/data/to_training/
+detection_system/data/*
+!detection_system/data/generated_model/
+detection_system/data/generated_model/*
+!detection_system/data/generated_model/modelo_libras.pkl
+!detection_system/data/generated_model/dados_libras.npz
 
 # Node
 node_modules/

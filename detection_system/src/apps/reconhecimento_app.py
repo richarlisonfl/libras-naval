@@ -14,24 +14,10 @@ import argparse
 warnings.filterwarnings('ignore')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# Adicionar o diretório atual ao path para importar o módulo sistema_libras
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Permite execução direta pelo terminal.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# Tentativa de import inteligente para permitir execução direta e como módulo
-try:
-    # Quando executado como parte de um pacote (python -m src.main_reconhecimento_final_adaptado)
-    from .camera import Camera
-except Exception:
-    try:
-        # Quando executado diretamente (python src/main_reconhecimento_final_adaptado.py)
-        from src.camera import Camera
-    except Exception:
-        # Fallback: garantir que o diretório pai esteja no sys.path e tentar novamente
-        import sys as _sys, os as _os
-        _parent = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
-        if _parent not in _sys.path:
-            _sys.path.insert(0, _parent)
-        from src.camera import Camera
+from src.core.camera import Camera
 
 
 def parse_args():
@@ -58,7 +44,7 @@ class ReconhecimentoApp:
 
         Retorna True se o modelo foi carregado com sucesso.
         """
-        from sistema_libras.reconhecedor import ReconhecedorLibras
+        from src.services.reconhecedor import ReconhecedorLibras
 
         print(" Carregando componentes...")
         self.reconhecedor = ReconhecedorLibras(indice_camera=self.camera)
@@ -83,7 +69,7 @@ class ReconhecimentoApp:
                 self.reconhecedor.executar_reconhecimento()
             else:
                 print(" Modelo não encontrado!")
-                print(" Execute: python libras_naval.py (e selecione a opção de treinamento)")
+                print(" Execute: python main.py (e selecione a opção de treinamento)")
             return True
         except KeyboardInterrupt:
             print("\n Programa finalizado pelo usuário")

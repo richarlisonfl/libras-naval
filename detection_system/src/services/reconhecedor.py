@@ -1,32 +1,32 @@
 import cv2
 import numpy as np
-from .utilitarios import UtilitariosMaos
-from .classificador import ClassificadorLibras
+from src.core.detector_maos import DetectorMaos
+from src.core.classificador import ClassificadorLibras
 import sys
 import os
 import config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import time
-import websocketConnect
+from src.services import websocket
 
 class ReconhecedorLibras:
     def __init__(self, indice_camera=0):
-        self.utilitarios = UtilitariosMaos()
+        self.utilitarios = DetectorMaos()
         self.classificador = ClassificadorLibras()
         self.historico = []
         self.ultima_previsao = "?"
         self.indice_camera = indice_camera
         # Instanciar servidor WebSocket (mantém conexões abertas)
         try:
-            self.websocket_server = websocketConnect.WebsocketServer()
+            self.websocket_server = websocket.WebsocketServer()
         except Exception as erro:
             print(f"WebSocket indisponível: {erro}")
             self.websocket_server = None
-        
+
     def carregar_modelo(self, nome_arquivo="modelo_libras.pkl"):
         """Carrega modelo treinado"""
         return self.classificador.carregar_modelo(nome_arquivo)
-    
+
     def executar_reconhecimento(self):
         """Executa reconhecimento em tempo real"""
         if not self.carregar_modelo():
@@ -41,9 +41,9 @@ class ReconhecedorLibras:
 
         camera.set(cv2.CAP_PROP_FRAME_WIDTH, config.CONFIG['dimensao_imagem'][0])
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CONFIG['dimensao_imagem'][1])
-        
+
         print("Reconhecimento iniciado. Pressione 'q' para sair.")
-        
+
         try:
             while True:
                 sucesso, quadro = camera.read()
@@ -123,7 +123,7 @@ class ReconhecedorLibras:
             cv2.destroyAllWindows()
 
         return True
-    
+
     def _atualizar_historico(self, previsao, confianca):
         """Atualiza histórico para suavizar previsões"""
         if previsao != "?":
@@ -131,18 +131,18 @@ class ReconhecedorLibras:
             # Manter apenas últimas 5 previsões
             if len(self.historico) > 5:
                 self.historico.pop(0)
-            
+
             # Usar moda do histórico para previsão final
             if len(self.historico) >= 3:
                 previsoes = [p[0] for p in self.historico]
                 previsao_final = max(set(previsoes), key=previsoes.count)
                 self.ultima_previsao = previsao_final
-    
+
     def _desenhar_interface(self, quadro, previsao, confianca, indicator_color=None):
         """Desenha interface na tela - SEMPRE mostra resultado"""
 
         altura, largura = quadro.shape[:2]
-        
+
         # Indicador central (onde posicionar a mão para reconhecimento)
         # Quadrado de tamanho relativo à menor dimensão do frame
         tamanho_relativo = 0.25
@@ -167,7 +167,7 @@ class ReconhecedorLibras:
         overlay = quadro.copy()
         cv2.rectangle(overlay, (0, 0), (largura_painel, altura_painel), (0, 0, 0), -1)
         cv2.addWeighted(overlay, 0.3, quadro, 0.7, 0, quadro)
-        
+
         # Borda do painel
         cv2.rectangle(quadro, (0, 0), (largura_painel, altura_painel), (0, 255, 0), 2)
 
@@ -179,57 +179,57 @@ class ReconhecedorLibras:
             cor_texto = (0, 255, 255)  # Amarelo - Confiável
             status = "CONFIANCA MEDIA"
         elif confianca > 0.4:
-            cor_texto = (0, 165, 255)  # Laranja - Pouco confiável  
+            cor_texto = (0, 165, 255)  # Laranja - Pouco confiável
             status = "BAIXA CONFIANCA"
         else:
             cor_texto = (0, 0, 255)  # Vermelho - Muito baixa
             status = "MUITO BAIXA CONFIANCA"
-        
+
         # Sempre mostrar a previsão, mesmo com confiança baixa
-        cv2.putText(quadro, f"SINAL: {previsao}", (20, 40), 
+        cv2.putText(quadro, f"SINAL: {previsao}", (20, 40),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_texto, 3)
-        
+
         # Mostrar confiança com barra visual
-        cv2.putText(quadro, f"CONFIANCA: {confianca:.3f}", (20, 80), 
+        cv2.putText(quadro, f"CONFIANCA: {confianca:.3f}", (20, 80),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_texto, 2)
-        
+
         # Barra de confiança visual
         largura_barra = 200
         altura_barra = 20
         x_barra = 20
         y_barra = 100
-        
+
         # Fundo da barra (cinza)
-        cv2.rectangle(quadro, (x_barra, y_barra), 
-                    (x_barra + largura_barra, y_barra + altura_barra), 
+        cv2.rectangle(quadro, (x_barra, y_barra),
+                    (x_barra + largura_barra, y_barra + altura_barra),
                     (100, 100, 100), -1)
-        
+
         # Preenchimento da barra (baseado na confiança)
         comprimento_preenchimento = int(confianca * largura_barra)
-        cv2.rectangle(quadro, (x_barra, y_barra), 
-                    (x_barra + comprimento_preenchimento, y_barra + altura_barra), 
+        cv2.rectangle(quadro, (x_barra, y_barra),
+                    (x_barra + comprimento_preenchimento, y_barra + altura_barra),
                     cor_texto, -1)
-        
+
         # Borda da barra
-        cv2.rectangle(quadro, (x_barra, y_barra), 
-                    (x_barra + largura_barra, y_barra + altura_barra), 
+        cv2.rectangle(quadro, (x_barra, y_barra),
+                    (x_barra + largura_barra, y_barra + altura_barra),
                     (255, 255, 255), 1)
-        
+
         # Status textual
-        cv2.putText(quadro, f"STATUS: {status}", (20, 135), 
+        cv2.putText(quadro, f"STATUS: {status}", (20, 135),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.3, cor_texto, 1)
-        
+
         # Mostrar todas as probabilidades (opcional - para debug)
         if hasattr(self, 'mostrar_detalhes') and self.mostrar_detalhes:
             self._mostrar_probabilidades_detalhadas(quadro, confianca)
-        
+
         # Previsão suavizada do histórico
         # if self.ultima_previsao != "?":
-        #     cv2.putText(quadro, f"SUAVIZADO: {self.ultima_previsao}", (20, 450), 
+        #     cv2.putText(quadro, f"SUAVIZADO: {self.ultima_previsao}", (20, 450),
         #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
-        
+
         # Instruções
-        cv2.putText(quadro, "Pressione 'q' para sair", (400, 470), 
+        cv2.putText(quadro, "Pressione 'q' para sair", (400, 470),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
     def _mostrar_probabilidades_detalhadas(self, quadro, confianca_atual):

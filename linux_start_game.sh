@@ -3,8 +3,8 @@
 # Caminho base do script (resolvido para caminho absoluto)
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Ambiente virtual único do componente Python
-VENV_DIR="$BASE_DIR/computer_vision/.venv"
-REQ_FILE="$BASE_DIR/computer_vision/requirements.txt"
+VENV_DIR="$BASE_DIR/detection_system/.venv"
+REQ_FILE="$BASE_DIR/detection_system/requirements.txt"
 
 ###############################################
 # Instalar Python 3.11 caso não exista
@@ -40,11 +40,24 @@ else
     echo "Python 3.11 encontrado: $(python3.11 --version)"
 fi
 
+if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "Node.js e npm são necessários para iniciar o servidor do jogo."
+    echo "Instale Node.js (incluindo npm) e execute este script novamente."
+    exit 1
+fi
+echo "Node.js encontrado: $(node --version)"
+echo "npm encontrado: $(npm --version)"
+
 ###############################################
 # 2) Criar ambiente virtual com Python 3.11
 ###############################################
-if [ ! -d "$VENV_DIR" ]; then
-    echo "Criando ambiente virtual em $VENV_DIR..."
+if [ ! -x "$VENV_DIR/bin/python" ]; then
+    if [ -d "$VENV_DIR" ]; then
+        echo "Ambiente virtual incompleto. Recriando em $VENV_DIR..."
+        rm -rf "$VENV_DIR"
+    else
+        echo "Criando ambiente virtual em $VENV_DIR..."
+    fi
     python3.11 -m venv "$VENV_DIR" || { echo "Erro ao criar venv"; exit 1; }
 else
     echo "Ambiente virtual já existe. Pulando criação."
@@ -63,35 +76,11 @@ if [ ! -f "$REQ_FILE" ]; then
     exit 1
 fi
 
-echo "Verificando dependências..."
-
-deps_faltando=false
-
-while IFS= read -r line || [ -n "$line" ]; do
-    # Ignorar linhas vazias ou comentários
-    [[ -z "$line" || "$line" == \#* ]] && continue
-    
-    pkg=$(echo "$line" | cut -d'=' -f1)
-    ver_esperada="$line"
-    ver_instalada=$(python -m pip show "$pkg" 2>/dev/null | grep Version | awk '{print $2}')
-
-    if [ -z "$ver_instalada" ]; then
-        echo "Pacote ausente: $pkg"
-        deps_faltando=true
-    else
-        if [ "$line" != "$pkg==$ver_instalada" ]; then
-            echo "Versão divergente: $pkg (instalada $ver_instalada, esperado $ver_esperada)"
-            deps_faltando=true
-        fi
-    fi
-done < "$REQ_FILE"
-
-if [ "$deps_faltando" = true ]; then
-    echo "Instalando/Atualizando dependências..."
-    python -m pip install -r "$REQ_FILE" || { echo "Erro ao instalar dependências"; exit 1; }
-else
-    echo "Todas as dependências já estão satisfeitas."
-fi
+echo "Instalando/verificando dependências..."
+python -m pip install -r "$REQ_FILE" || {
+    echo "Erro ao instalar dependências"
+    exit 1
+}
 
 ###############################################
 # Encerramento limpo ao pressionar Ctrl+C
@@ -126,14 +115,8 @@ cd "$BASE_DIR" || exit 1
 
 echo "Iniciando script de reconhecimento..."
 # Use o python do venv para garantir as dependências corretas
-if [ -x "$VENV_DIR/bin/python" ]; then
-    "$VENV_DIR/bin/python" computer_vision/src/reconhecimento_app.py &
-    RECON_PID=$!
-else
-    # fallback para python3.11 do sistema
-    python3.11 computer_vision/src/reconhecimento_app.py &
-    RECON_PID=$!
-fi
+"$VENV_DIR/bin/python" detection_system/src/apps/reconhecimento_app.py &
+RECON_PID=$!
 echo "Reconhecimento PID: $RECON_PID"
 
 echo "Pressione Ctrl+C para encerrar ambos os processos."

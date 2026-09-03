@@ -1,4 +1,4 @@
-# 🤝 Sistema de Reconhecimento de LIBRAS Naval
+# 🤝 Sistema de Reconhecimento de LibrasNaval
 
 Um sistema completo de reconhecimento de LIBRAS (Linguagem Brasileira de Sinais) Naval com suporte a treinamento e reconhecimento em tempo real.
 
@@ -16,14 +16,14 @@ Um sistema completo de reconhecimento de LIBRAS (Linguagem Brasileira de Sinais)
 ### 1. Iniciar o Menu Principal
 
 ```bash
-python libras_naval.py
+python main.py
 ```
 
 Isso abrirá um menu interativo com as seguintes opções:
 
 ```
 ╔══════════════════════════════════════════════════════════╗
-║   🤝 SISTEMA DE RECONHECIMENTO DE LIBRAS NAVAL         ║
+║   🤝 SISTEMA DE RECONHECIMENTO DE LibrasNaval         ║
 ╚══════════════════════════════════════════════════════════╝
 
 📋 MENU PRINCIPAL
@@ -60,12 +60,12 @@ Isso abrirá um menu interativo com as seguintes opções:
 1. Selecione a opção `1 - Treinamento`
 2. Selecione `2 - Treinar com Imagens de Pastas`
 3. Escolha o índice da câmera
-4. Digite o caminho das pastas (padrão: `dados_treinamento`)
+4. Digite o caminho das pastas (padrão: `data/to_training`)
 
 **Estrutura esperada:**
 
 ```
-dados_treinamento/
+data/to_training/
 ├── A/
 │   ├── imagem1.jpg
 │   ├── imagem2.jpg
@@ -88,7 +88,7 @@ Uma forma rápida e organizada de coletar imagens para treinar o modelo:
 
 1. Selecione a opção `2 - Capturar Imagens para Treinamento`
 2. Escolha o índice da câmera
-3. O sistema detectará automaticamente as pastas de classes em `dados_treinamento/`
+3. O sistema detectará automaticamente as pastas de classes em `data/to_training/`
 4. Para cada classe:
    - Posicione seu sinal na câmera
    - Pressione **ESPAÇO** para capturar a imagem
@@ -140,24 +140,32 @@ Verifica se a câmera e o MediaPipe estão funcionando corretamente.
 
 ```
 libras-naval/
-├── libras_naval.py                      # Menu principal
-├── capturador_imagens.py                # Capturador de imagens por classe
-├── main_treinamento_facil_adaptado.py   # Script de treinamento adaptado
-├── main_reconhecimento_final_adaptado.py # Script de reconhecimento adaptado
-├── teste_rapido.py                      # Teste de setup
+├── main.py                              # Menu principal
 ├── config.py                            # Configurações globais
 ├── requirements.txt                     # Dependências
-├── sistema_libras/
-│   ├── __init__.py
-│   ├── coletor_dados.py                 # Coleta de dados da câmera
-│   ├── classificador.py                 # Classificador ML
-│   ├── reconhecedor.py                  # Engine de reconhecimento
-│   ├── utilitarios.py                   # Funções auxiliares
-│   └── treinamento_incremental.py       # Treinamento incremental
-├── dados_treinamento/                   # Pasta para imagens de treinamento
-│   └── (subpastas com nomes de classes)
-├── modelos_treinados/                   # Modelos salvos
-│   └── modelo_libras.pkl
+└── src/
+   ├── apps/
+   │   ├── capturador_imagens.py        # Captura de imagens
+   │   ├── treinamento_app.py           # Treinamento
+   │   └── reconhecimento_app.py        # Reconhecimento
+   ├── core/
+   │   ├── camera.py                    # Acesso à câmera
+   │   ├── detector_maos.py             # Detecção e landmarks
+   │   ├── classificador.py             # Classificador ML
+   │   └── coletor_dados.py             # Coleta de características
+   ├── services/
+   │   ├── reconhecedor.py              # Reconhecimento em tempo real
+   │   ├── treinamento_incremental.py   # Treinamento incremental
+   │   └── websocket.py                 # Comunicação WebSocket
+   └── tools/
+      ├── teste_rapido.py              # Teste de setup
+      ├── validar_sistema.py           # Validação completa
+      └── verificar_sistema.py         # Verificação rápida
+├── data/
+│   ├── to_training/                     # Imagens (ignoradas pelo Git)
+│   └── generated_model/                 # Artefatos versionáveis
+│       ├── modelo_libras.pkl
+│       └── dados_libras.npz
 └── README.md                            # Este arquivo
 ```
 
@@ -166,14 +174,25 @@ libras-naval/
 ### Instalação de Dependências
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Dependências necessárias:
-- `opencv-python`: Processamento de imagens
-- `mediapipe`: Detecção de landmarks das mãos
+- `opencv-contrib-python`: Processamento de imagens
+- `mediapipe`: Detecção de landmarks das mãos pela API Tasks
 - `scikit-learn`: Classificação de dados
 - `numpy`: Operações numéricas
+
+O primeiro uso do sistema baixa automaticamente o arquivo `hand_landmarker.task`
+para `models/`. Para usar um arquivo já baixado, defina
+`MEDIAPIPE_HAND_LANDMARKER_MODEL` com o caminho completo do modelo antes de
+executar o sistema.
+
+O treinamento salva o modelo em `data/generated_model/modelo_libras.pkl` e as
+características numéricas em `data/generated_model/dados_libras.npz`. As
+imagens permanecem ignoradas pelo Git, mas esses dois artefatos podem ser
+versionados. O arquivo `.npz` permite continuar o treinamento de forma
+incremental sem as imagens anteriores.
 
 ### Arquivo de Configuração (config.py)
 
@@ -183,7 +202,7 @@ Você pode ajustar as seguintes configurações:
 CONFIG = {
     'dimensao_imagem': (640, 480),           # Resolução da câmera
     'numero_amostras_por_classe': 20,        # Amostras por classe no treinamento
-    'caminho_dados': 'dados_treinamento',    # Pasta de dados
+   'caminho_dados': 'data/to_training',     # Pasta de imagens
     'limite_confianca': 0.6,                 # Limite mínimo de confiança
 }
 ```
@@ -195,46 +214,46 @@ CONFIG = {
 #### Capturar Imagens para Treinamento
 
 ```bash
-python capturador_imagens.py --camera 0
+python src/apps/capturador_imagens.py --camera 0
 ```
 
 #### Treinamento com Webcam
 
 ```bash
-python main_treinamento_facil_adaptado.py --camera 0 --modo webcam
+python src/apps/treinamento_app.py --camera 0 --modo webcam
 ```
 
 #### Treinamento com Pastas
 
 ```bash
-python main_treinamento_facil_adaptado.py --camera 0 --modo pastas --caminho dados_treinamento
+python src/apps/treinamento_app.py --camera 0 --modo pastas --caminho data/to_training
 ```
 
 #### Reconhecimento
 
 ```bash
-python main_reconhecimento_final_adaptado.py --camera 0
+python src/apps/reconhecimento_app.py --camera 0
 ```
 
 ### Parâmetros de Linha de Comando
 
-**capturador_imagens.py:**
+**src/apps/capturador_imagens.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
-- `--caminho CAMINHO`: Caminho para pasta de classes (padrão: dados_treinamento)
+- `--caminho CAMINHO`: Caminho para pasta de classes (padrão: data/to_training)
 
-**main_treinamento_facil_adaptado.py:**
+**src/apps/treinamento_app.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
 - `--modo [webcam|pastas]`: Modo de treinamento (padrão: webcam)
-- `--caminho CAMINHO`: Caminho para pasta de imagens (padrão: dados_treinamento)
+- `--caminho CAMINHO`: Caminho para pasta de imagens (padrão: data/to_training)
 
-**main_reconhecimento_final_adaptado.py:**
+**src/apps/reconhecimento_app.py:**
 - `--camera N`: Índice da câmera (padrão: 0)
 
 ## 📊 Fluxo de Funcionamento
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│        Menu Principal (libras_naval.py)             │
+│        Menu Principal (main.py)                    │
 └─────────────────────────────────────────────────────┘
                         │
         ┌───────────────┼───────────────┬───────────────┐
@@ -288,7 +307,7 @@ python main_reconhecimento_final_adaptado.py --camera 0
 ### Modelo não encontrado
 
 - Execute o treinamento primeiro
-- Verifique se o arquivo `modelos_treinados/modelo_libras.pkl` existe
+- Verifique se o arquivo `data/generated_model/modelo_libras.pkl` existe
 
 ### Baixa precisão de reconhecimento
 
@@ -302,7 +321,7 @@ python main_reconhecimento_final_adaptado.py --camera 0
 
 ```bash
 # Opção 1: Via menu principal
-python libras_naval.py
+python main.py
 # Selecione: 2 - Capturar Imagens para Treinamento
 
 # Opção 2: Diretamente
@@ -310,7 +329,7 @@ python capturador_imagens.py --camera 0
 ```
 
 Instrações:
-- Crie pastas em `dados_treinamento/` com nomes das classes (ex: A, B, C)
+- Crie pastas em `data/to_training/` com nomes das classes (ex: A, B, C)
 - Execute o capturador
 - Para cada classe, pressione ESPAÇO para capturar
 - Pressione ENTER para ir para a próxima classe
@@ -319,16 +338,16 @@ Instrações:
 ### Exemplo 2: Treinar com Imagens Capturadas
 
 ```bash
-python libras_naval.py
+python main.py
 # Selecione: 1 - Treinamento
 # Selecione: 2 - Treinar com Imagens de Pastas
-# Digite: dados_treinamento (as imagens que você capturou)
+# Digite: data/to_training (as imagens que você capturou)
 ```
 
 ### Exemplo 3: Treinamento Rápido de Vogais
 
 ```bash
-python libras_naval.py
+python main.py
 # Selecione: 1 - Treinamento
 # Selecione: 1 - Treinar com Webcam
 # Selecione: 1 - Treinar apenas vogais
@@ -348,7 +367,7 @@ python libras_naval.py
 
 2. Execute:
    ```bash
-   python libras_naval.py
+   python main.py
    # Selecione: 1 - Treinamento
    # Selecione: 2 - Treinar com Imagens de Pastas
    # Digite: meus_dados
@@ -358,7 +377,7 @@ python libras_naval.py
 
 ```bash
 # Se você tem múltiplas câmeras
-python libras_naval.py
+python main.py
 # Quando solicitado, escolha o índice correto da câmera
 ```
 
@@ -372,7 +391,7 @@ Este projeto está sob a licença [MIT](LICENSE).
 
 ## 👥 Autores
 
-- Desenvolvido para o Sistema de LIBRAS Naval
+- Desenvolvido para o Sistema de LibrasNaval
 
 ## 🙏 Agradecimentos
 

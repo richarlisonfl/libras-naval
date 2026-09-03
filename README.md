@@ -1,4 +1,4 @@
-# Sistema de Reconhecimento de LIBRAS Naval
+# Sistema de Reconhecimento de LibrasNaval
 
 Sistema para captura de imagens, treinamento e reconhecimento de sinais de LIBRAS em tempo real. O projeto possui uma aplicação Python de visão computacional e um servidor Node.js usado pela interface do jogo.
 
@@ -10,33 +10,35 @@ Sistema para captura de imagens, treinamento e reconhecimento de sinais de LIBRA
 - Linux ou Windows
 - Ambiente gráfico para abrir as janelas do OpenCV
 
-O código atual usa a API `mediapipe.solutions`. Por isso, a versão compatível é:
+O código atual usa a API `mediapipe.tasks` (MediaPipe Tasks). A versão fixada é:
 
 ```text
-mediapipe==0.10.14
+mediapipe==1.0.1
 ```
 
-Não substitua essa versão por `mediapipe 1.x` sem adaptar o código de detecção de mãos.
+O código de detecção de mãos usa a API Tasks compatível com o MediaPipe 1.x.
 
 ## Estrutura principal
 
 ```text
 libras-naval/
-├── computer_vision/
+├── detection_system/
 │   ├── .venv/                  # Ambiente Python principal
-│   ├── venv_atualizado/        # Ambiente opcional para testes
 │   ├── main.py                 # Menu principal
 │   ├── config.py               # Configurações e caminhos
 │   ├── requirements.txt        # Dependências Python
 │   ├── data/
 │   │   ├── to_training/        # Imagens organizadas por classe
-│   │   └── generated_model/    # Modelo treinado
+│   │   └── generated_model/    # Modelo e características treinadas
 │   └── src/
 │       ├── camera.py
 │       ├── capturador_imagens.py
 │       ├── reconhecimento_app.py
 │       ├── treinamento_app.py
-│       └── sistema_libras/
+│       ├── apps/
+│       ├── core/
+│       ├── services/
+│       └── tools/
 ├── game_interface/             # Interface do jogo
 ├── game_server/                # Servidor Node.js
 ├── linux_start_game.sh         # Inicializador Linux
@@ -56,7 +58,7 @@ chmod +x linux_start_game.sh
 O script:
 
 1. Verifica se o Python 3.11 está disponível.
-2. Cria `computer_vision/.venv` caso necessário.
+2. Cria `detection_system/.venv` caso necessário.
 3. Instala as dependências Python.
 4. Instala as dependências do servidor Node.js.
 5. Inicia o servidor e o reconhecimento.
@@ -66,7 +68,7 @@ Se o Python 3.11 não estiver instalado, o script tenta instalá-lo usando `sudo
 ## Execução manual Linux
 
 ```bash
-cd computer_vision
+cd detection_system
 source .venv/bin/activate
 python main.py
 ```
@@ -74,11 +76,11 @@ python main.py
 Também é possível executar sem ativar o ambiente:
 
 ```bash
-cd computer_vision
+cd detection_system
 .venv/bin/python main.py
 ```
 
-Não execute `python main.py` na raiz do projeto, pois o arquivo está dentro de `computer_vision`.
+Não execute `python main.py` na raiz do projeto, pois o arquivo está dentro de `detection_system`.
 
 ## Instalação e execução Windows
 
@@ -89,13 +91,13 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\windows_start_game.ps1
 ```
 
-O script usa o launcher `py -3.11` quando disponível, cria `computer_vision\\.venv`, instala as dependências, inicia o servidor em `game_server` e executa `src\\reconhecimento_app.py`.
+O script usa o launcher `py -3.11` quando disponível, cria `detection_system\\.venv`, instala as dependências, inicia o servidor em `game_server` e executa `src\\reconhecimento_app.py`.
 
 PowerShell é necessário porque o arquivo possui extensão `.ps1` e usa comandos próprios dessa linguagem.
 
 ## Menu principal
 
-O arquivo `computer_vision/main.py` oferece:
+O arquivo `detection_system/main.py` oferece:
 
 1. Reconhecimento em tempo real
 2. Treinamento
@@ -108,8 +110,8 @@ O arquivo `computer_vision/main.py` oferece:
 Para testar a sintaxe e as dependências principais:
 
 ```bash
-cd computer_vision
-.venv/bin/python -m py_compile main.py config.py src/*.py src/sistema_libras/*.py
+cd detection_system
+.venv/bin/python -m py_compile main.py config.py src/*.py src/**/*.py
 .venv/bin/python -c "import cv2, mediapipe, websockets; print('Dependências principais OK')"
 ```
 
@@ -126,13 +128,13 @@ Mensagens do OpenCV informando que índices inexistentes não puderam ser aberto
 Crie uma pasta para cada classe dentro de:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ```
 
 Exemplo:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ├── 1/
 ├── 2/
 └── 3/
@@ -187,8 +189,18 @@ São necessárias pelo menos duas classes e pelo menos duas amostras por classe.
 O modelo é salvo em:
 
 ```text
-computer_vision/data/generated_model/modelo_libras.pkl
+detection_system/data/generated_model/modelo_libras.pkl
 ```
+
+As características numéricas usadas no treinamento são salvas em:
+
+```text
+detection_system/data/generated_model/dados_libras.npz
+```
+
+As imagens originais não são necessárias para executar o reconhecimento. O
+arquivo `.npz` é mantido para permitir novos treinamentos incrementais sem
+recuperar as imagens antigas.
 
 Esse arquivo contém:
 
@@ -197,6 +209,17 @@ Esse arquivo contém:
 - Mapeamento entre rótulos e números
 
 O modelo só funciona corretamente com características extraídas pelo mesmo código e na mesma ordem.
+
+### Treinamento incremental
+
+No menu, escolha `2. Treinamento` e depois `3. Treinamento incremental`. O
+sistema carrega `dados_libras.npz`, coleta as classes ainda não registradas,
+acrescenta as novas características e retreina o classificador com todo o
+conjunto numérico acumulado.
+
+O arquivo `modelo_libras.pkl` é usado no reconhecimento, enquanto
+`dados_libras.npz` é necessário para continuar treinando sem as imagens. Ambos
+podem ser versionados no Git; as imagens e a virtualenv continuam ignoradas.
 
 ## Reconhecimento em tempo real
 
@@ -232,7 +255,7 @@ O reconhecimento tenta iniciar um servidor WebSocket local na porta `8765`. A in
 Selecione o interpretador correto:
 
 ```text
-computer_vision/.venv/bin/python
+detection_system/.venv/bin/python
 ```
 
 No VS Code: `Ctrl+Shift+P` -> `Python: Select Interpreter`.
@@ -242,7 +265,7 @@ No VS Code: `Ctrl+Shift+P` -> `Python: Select Interpreter`.
 Use o ambiente do projeto:
 
 ```bash
-cd computer_vision
+cd detection_system
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
@@ -252,7 +275,7 @@ python -m pip install -r requirements.txt
 O ambiente está usando uma versão incompatível. Instale:
 
 ```bash
-python -m pip install --force-reinstall mediapipe==0.10.14
+python -m pip install --force-reinstall mediapipe==1.0.1
 ```
 
 ### Nenhuma classe encontrada
@@ -260,7 +283,7 @@ python -m pip install --force-reinstall mediapipe==0.10.14
 Verifique se existem subpastas dentro de:
 
 ```text
-computer_vision/data/to_training/
+detection_system/data/to_training/
 ```
 
 ### Modelo não encontrado
@@ -268,7 +291,7 @@ computer_vision/data/to_training/
 Treine o modelo antes de escolher o reconhecimento. O arquivo esperado é:
 
 ```text
-computer_vision/data/generated_model/modelo_libras.pkl
+detection_system/data/generated_model/modelo_libras.pkl
 ```
 
 ### O script não encontra um arquivo
@@ -276,7 +299,7 @@ computer_vision/data/generated_model/modelo_libras.pkl
 Execute os comandos a partir da raiz indicada no próprio comando. Para o menu Python:
 
 ```bash
-cd computer_vision
+cd detection_system
 python main.py
 ```
 
