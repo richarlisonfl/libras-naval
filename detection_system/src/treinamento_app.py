@@ -226,6 +226,11 @@ class TreinamentoAdaptado:
             print(f" Precisão: {precisao:.3%}")
             print(f" Tempo de treinamento: {duracao_treinamento:.2f}s")
             
+            classificador.salvar_dados_treinamento(
+                self.dados,
+                self.rotulos,
+                grupos=self.grupos if self.grupos else None,
+            )
             classificador.salvar_modelo()
             print(f" Modelo salvo!")
             
@@ -243,7 +248,12 @@ def parse_args():
     
     parser.add_argument('--camera', type=int, default=0, help='Índice da câmera (padrão: 0)')
     parser.add_argument('--modo', choices=['webcam', 'pastas'], default='webcam', help='Modo de treinamento')
-    parser.add_argument('--caminho', type=str, default='dados_treinamento', help='Caminho das pastas para treinamento')
+    parser.add_argument(
+        '--caminho',
+        type=str,
+        default=config.CONFIG['caminho_dados'],
+        help='Caminho das pastas para treinamento',
+    )
     
     return parser.parse_args()
 
@@ -358,7 +368,7 @@ def main():
     try:
         args = parse_args()
         print("="*60)
-        print(" SISTEMA DE TREINAMENTO - LIBRAS NAVAL")
+        print(" SISTEMA DE TREINAMENTO - LibrasNaval")
         print("="*60)
         print(f" Câmera: índice {args.camera}")
 

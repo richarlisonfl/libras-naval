@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Menu Principal do Sistema de Reconhecimento de LIBRAS Naval
-Coordena todas as funcionalidades do sistema
-"""
-
 import os
 import sys
 import subprocess
@@ -22,6 +17,7 @@ from src.camera import Camera
 from src.capturador_imagens import CapturadorImagens
 from src.reconhecimento_app import ReconhecimentoApp
 from src.treinamento_app import TreinamentoApp
+from src.sistema_libras.treinamento_incremental import TreinamentoIncremental
 
 
 def limpar_tela():
@@ -32,7 +28,7 @@ def exibir_banner():
     print("\n" + "=" * 60)
     print("╔" + "=" * 58 + "╗")
     print("║" + " " * 58 + "║")
-    print("║" + "  SISTEMA DE RECONHECIMENTO DE LIBRAS NAVAL   ".center(58) + "║")
+    print("║" + "  SISTEMA DE RECONHECIMENTO DE LIBRASNAVAL   ".center(58) + "║")
     print("║" + " " * 58 + "║")
     print("╚" + "=" * 58 + "╝")
     print("=" * 60 + "\n")
@@ -56,7 +52,8 @@ def exibir_menu_treinamento():
     print("-" * 60)
     print("1. Treinar com Webcam (Captura ao vivo)")
     print("2. Treinar com Imagens de Pastas (cada pasta = classe)")
-    print("3.Voltar ao Menu Principal")
+    print("3. Treinamento incremental")
+    print("4. Voltar ao Menu Principal")
     print("-" * 60)
 
 
@@ -112,6 +109,18 @@ def executar_treinamento_pastas():
         print(f"\n Erro ao executar treinamento: {e}")
 
 
+def executar_treinamento_incremental():
+    print("\n" + "-" * 60)
+    print("TREINAMENTO INCREMENTAL")
+    print("-" * 60)
+
+    try:
+        treinamento = TreinamentoIncremental()
+        treinamento.treinar_por_fases()
+    except Exception as e:
+        print(f"\n Erro ao executar treinamento incremental: {e}")
+
+
 def executar_reconhecimento():
     print("\n" + "-" * 60)
     print("RECONHECIMENTO EM TEMPO REAL")
@@ -142,7 +151,8 @@ def executar_teste_setup():
     try:
         resultado = subprocess.run(
             [sys.executable, os.path.join(BASE_DIR, 'src', 'teste_rapido.py')],
-            cwd=BASE_DIR
+            cwd=BASE_DIR,
+            check=False,
         )
         
         if resultado.returncode == 0:
@@ -181,19 +191,21 @@ def execute_images_capture():
 def menu_treinamento():
     while True:
         exibir_menu_treinamento()
-        opcao = input("\nEscolha uma opção (1-3): ").strip()
+        opcao = input("\nEscolha uma opção (1-4): ").strip()
         
         if opcao == "1":
             executar_treinamento_webcam()
         elif opcao == "2":
             executar_treinamento_pastas()
         elif opcao == "3":
+            executar_treinamento_incremental()
+        elif opcao == "4":
             print("Voltando ao menu principal...\n")
             break
         else:
             print(" Opção inválida! Tente novamente.")
         
-        if opcao in ["1", "2"]:
+        if opcao in ["1", "2", "3"]:
             pausar_menu("\nPressione ENTER para voltar ao menu de treinamento...")
 
 
@@ -218,7 +230,7 @@ def menu_principal():
             pausar_menu()
         elif opcao == "5":
             print("\n" + "="*60)
-            print("Obrigado por usar o Sistema de LIBRAS Naval!")
+            print("Obrigado por usar o Sistema de LibrasNaval!")
             print("="*60 + "\n")
             break
         else:
@@ -227,7 +239,6 @@ def menu_principal():
 
 
 def main():
-    """Função principal"""
     try:
         menu_principal()
     except KeyboardInterrupt:

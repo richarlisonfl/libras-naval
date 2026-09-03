@@ -19,11 +19,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Tentativa de import inteligente para permitir execução direta e como módulo
 try:
-    # Quando executado como parte de um pacote (python -m src.main_reconhecimento_final_adaptado)
+    # Quando executado como parte de um pacote.
     from .camera import Camera
 except Exception:
     try:
-        # Quando executado diretamente (python src/main_reconhecimento_final_adaptado.py)
+        # Quando executado diretamente.
         from src.camera import Camera
     except Exception:
         # Fallback: garantir que o diretório pai esteja no sys.path e tentar novamente
@@ -83,7 +83,7 @@ class ReconhecimentoApp:
                 self.reconhecedor.executar_reconhecimento()
             else:
                 print(" Modelo não encontrado!")
-                print(" Execute: python libras_naval.py (e selecione a opção de treinamento)")
+                print(" Execute: python main.py (e selecione a opção de treinamento)")
             return True
         except KeyboardInterrupt:
             print("\n Programa finalizado pelo usuário")

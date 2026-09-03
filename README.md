@@ -1,4 +1,4 @@
-# Sistema de Reconhecimento de LIBRAS Naval
+# Sistema de Reconhecimento de LibrasNaval
 
 Sistema para captura de imagens, treinamento e reconhecimento de sinais de LIBRAS em tempo real. O projeto possui uma aplicação Python de visão computacional e um servidor Node.js usado pela interface do jogo.
 
@@ -10,13 +10,13 @@ Sistema para captura de imagens, treinamento e reconhecimento de sinais de LIBRA
 - Linux ou Windows
 - Ambiente gráfico para abrir as janelas do OpenCV
 
-O código atual usa a API `mediapipe.solutions`. Por isso, a versão compatível é:
+O código atual usa a API `mediapipe.tasks` (MediaPipe Tasks). A versão fixada é:
 
 ```text
-mediapipe==0.10.14
+mediapipe==1.0.1
 ```
 
-Não substitua essa versão por `mediapipe 1.x` sem adaptar o código de detecção de mãos.
+O código de detecção de mãos usa a API Tasks compatível com o MediaPipe 1.x.
 
 ## Estrutura principal
 
@@ -29,7 +29,7 @@ libras-naval/
 │   ├── requirements.txt        # Dependências Python
 │   ├── data/
 │   │   ├── to_training/        # Imagens organizadas por classe
-│   │   └── generated_model/    # Modelo treinado
+│   │   └── generated_model/    # Modelo e características treinadas
 │   └── src/
 │       ├── camera.py
 │       ├── capturador_imagens.py
@@ -189,6 +189,16 @@ O modelo é salvo em:
 detection_system/data/generated_model/modelo_libras.pkl
 ```
 
+As características numéricas usadas no treinamento são salvas em:
+
+```text
+detection_system/data/generated_model/dados_libras.npz
+```
+
+As imagens originais não são necessárias para executar o reconhecimento. O
+arquivo `.npz` é mantido para permitir novos treinamentos incrementais sem
+recuperar as imagens antigas.
+
 Esse arquivo contém:
 
 - Classificador treinado
@@ -196,6 +206,17 @@ Esse arquivo contém:
 - Mapeamento entre rótulos e números
 
 O modelo só funciona corretamente com características extraídas pelo mesmo código e na mesma ordem.
+
+### Treinamento incremental
+
+No menu, escolha `2. Treinamento` e depois `3. Treinamento incremental`. O
+sistema carrega `dados_libras.npz`, coleta as classes ainda não registradas,
+acrescenta as novas características e retreina o classificador com todo o
+conjunto numérico acumulado.
+
+O arquivo `modelo_libras.pkl` é usado no reconhecimento, enquanto
+`dados_libras.npz` é necessário para continuar treinando sem as imagens. Ambos
+podem ser versionados no Git; as imagens e a virtualenv continuam ignoradas.
 
 ## Reconhecimento em tempo real
 
@@ -251,7 +272,7 @@ python -m pip install -r requirements.txt
 O ambiente está usando uma versão incompatível. Instale:
 
 ```bash
-python -m pip install --force-reinstall mediapipe==0.10.14
+python -m pip install --force-reinstall mediapipe==1.0.1
 ```
 
 ### Nenhuma classe encontrada

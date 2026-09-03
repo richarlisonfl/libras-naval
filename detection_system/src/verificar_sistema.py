@@ -5,6 +5,7 @@ Verifica se todo o sistema está configurado corretamente
 
 import os
 import sys
+import config
 
 print(" VERIFICANDO SISTEMA...")
 print("=" * 50)
@@ -12,7 +13,7 @@ print("=" * 50)
 # Verificar arquivos necessários
 arquivos_necessarios = [
     'sistema_libras/__init__.py',
-    'sistema_libras/coletor_dados.py', 
+    'sistema_libras/coletor_dados.py',
     'sistema_libras/classificador.py',
     'sistema_libras/reconhecedor.py',
     'sistema_libras/utilitarios.py',
@@ -29,7 +30,7 @@ for arquivo in arquivos_necessarios:
 
 # Verificar se o modelo existe
 print("\n Verificando modelo treinado...")
-if os.path.exists('modelos_treinados/modelo_libras.pkl'):
+if os.path.exists(os.path.join(config.CONFIG['caminho_modelos'], 'modelo_libras.pkl')):
     print(" Modelo treinado encontrado!")
     print(" Pode executar: python main_reconhecimento.py")
 else:
@@ -46,7 +47,7 @@ except ImportError:
 
 try:
     import mediapipe
-    print(" MediaPipe instalado") 
+    print(" MediaPipe instalado")
 except ImportError:
     print(" MediaPipe não instalado")
 

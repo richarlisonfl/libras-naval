@@ -2,7 +2,7 @@
 """
 Capturador de Imagens para Treinamento
 Salva imagens capturadas da webcam em pastas organizadas por classe
-Cada pasta em dados_treinamento/ é uma classe
+Cada pasta em data/to_training/ é uma classe
 As imagens são salvas como: {classe}_{contador}.jpg
 """
 
@@ -321,7 +321,7 @@ def main():
         
         print("\n" + "╔" + "="*68 + "╗")
         print("║" + " "*68 + "║")
-        print("║" + "    CAPTURADOR DE IMAGENS - LIBRAS NAVAL   ".center(68) + "║")
+        print("║" + "    CAPTURADOR DE IMAGENS - LibrasNaval   ".center(68) + "║")
         print("║" + " "*68 + "║")
         print("╚" + "="*68 + "╝\n")
         

@@ -26,9 +26,9 @@ def verificar_modulo(nome_modulo, nome_pacote=None):
 def verificar_arquivos():
     """Verifica se os arquivos principais existem"""
     arquivos_necessarios = [
-        'libras_naval.py',
-        'main_treinamento_facil_adaptado.py',
-        'main_reconhecimento_final_adaptado.py',
+        'main.py',
+        'src/treinamento_app.py',
+        'src/reconhecimento_app.py',
         'sistema_libras/__init__.py',
         'sistema_libras/coletor_dados.py',
         'sistema_libras/classificador.py',
@@ -130,7 +130,7 @@ def main():
     """Função principal"""
     print("\n" + "╔" + "="*58 + "╗")
     print("║" + " "*58 + "║")
-    print("║" + "    VALIDAÇÃO DO SISTEMA - LIBRAS NAVAL".center(58) + "║")
+    print("║" + "    VALIDAÇÃO DO SISTEMA - LibrasNaval".center(58) + "║")
     print("║" + " "*58 + "║")
     print("╚" + "="*58 + "╝\n")
     
@@ -153,7 +153,7 @@ def main():
         print("\n" + "="*60)
         print(" SISTEMA PRONTO PARA USO!")
         print("="*60)
-        print("\n▶  Execute: python libras_naval.py")
+        print("\n▶  Execute: python main.py")
         print("\nPara mais informações, veja: README_MENU.md\n")
         return 0
     else:

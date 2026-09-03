@@ -4,8 +4,10 @@ Debug do reconhecimento
 """
 
 import cv2
+import os
 import numpy as np
 
+import config
 from sistema_libras.utilitarios import UtilitariosMaos
 
 print(" Debug - Testando componente por componente...")
@@ -36,7 +38,10 @@ except Exception as e:
 print("3. Testando modelo...")
 try:
     import pickle
-    with open('modelos_treinados/modelo_libras.pkl', 'rb') as f:
+    caminho_modelo = os.path.join(
+        config.CONFIG['caminho_modelos'], 'modelo_libras.pkl'
+    )
+    with open(caminho_modelo, 'rb') as f:
         model_data = pickle.load(f)
     print(f" Modelo OK - {len(model_data['decoder'])} classes")
 except Exception as e:
