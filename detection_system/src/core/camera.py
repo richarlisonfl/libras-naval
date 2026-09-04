@@ -24,6 +24,11 @@ class Camera:
             print("    Nenhuma câmera encontrada!")
             return None
         
+        if len(cameras_disponiveis) == 1:
+            indice = cameras_disponiveis[0]
+            print(f" Câmera {indice} selecionada automaticamente!")
+            return indice
+
         print("\nCâmeras disponíveis:", cameras_disponiveis)
         
         while True:

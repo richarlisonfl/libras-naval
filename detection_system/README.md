@@ -28,14 +28,28 @@ Isso abrirá um menu interativo com as seguintes opções:
 
 📋 MENU PRINCIPAL
 ─────────────────────────────────────────────────────────
-1. 🎓 Treinamento
-2. 📸 Capturar Imagens para Treinamento
-3. 🎯 Reconhecimento em Tempo Real
-4. 🔍 Teste de Setup (Câmera + MediaPipe)
-5. 🚪 Sair
+1. 🎯 Reconhecimento em Tempo Real
+2. 🎓 Treinamento por sinal
+3. 🔍 Teste de Setup (Câmera + MediaPipe)
+4. 🚪 Sair
 ```
 
-### 2. Opção 1: Treinamento
+### 2. Opção 2: Treinamento por sinal
+
+O fluxo recomendado treina um sinal por vez. Escolha uma das opções:
+
+- Sinal estático: coleta amostras individuais.
+- Sinal com movimento: coleta uma sequência de frames.
+- Estatísticas: mostra sessões e pessoas registradas por sinal.
+
+Use o mesmo nome do sinal e um identificador consistente para cada pessoa.
+Novas sessões acumulam dados anteriores e podem reforçar somente os sinais com
+baixo desempenho.
+
+O treinamento com imagens por pastas permanece disponível apenas pelos scripts
+individuais e não faz parte do menu principal.
+
+### Fluxo antigo de treinamento
 
 #### A. Treinar com Webcam
 
@@ -82,7 +96,7 @@ Cada pasta representa uma **classe/label** para treinamento. O sistema:
 - Extrai características dos landmarks
 - Treina um modelo com todas as amostras
 
-### 2. Opção 2: Capturar Imagens para Treinamento
+### Fluxo auxiliar: Capturar Imagens para Treinamento
 
 Uma forma rápida e organizada de coletar imagens para treinar o modelo:
 
@@ -117,7 +131,7 @@ Uma forma rápida e organizada de coletar imagens para treinar o modelo:
 - ✅ Interface compacta no canto superior esquerdo
 - ✅ Ideal para coletar dados de treinamento antes de usar a opção "Treinar com Imagens de Pastas"
 
-### 3. Opção 3: Reconhecimento em Tempo Real
+### 3. Opção 1: Reconhecimento em Tempo Real
 
 1. Selecione a opção `3 - Reconhecimento em Tempo Real`
 2. Escolha o índice da câmera
@@ -132,7 +146,7 @@ Uma forma rápida e organizada de coletar imagens para treinar o modelo:
 - Barra visual mostrando o nível de confiança
 - **SUAVIZADO**: Previsão suavizada com base no histórico
 
-### 4. Opção 4: Teste de Setup
+### 4. Opção 3: Teste de Setup
 
 Verifica se a câmera e o MediaPipe estão funcionando corretamente.
 
@@ -183,10 +197,17 @@ Dependências necessárias:
 - `scikit-learn`: Classificação de dados
 - `numpy`: Operações numéricas
 
-O primeiro uso do sistema baixa automaticamente o arquivo `hand_landmarker.task`
-para `models/`. Para usar um arquivo já baixado, defina
+O primeiro uso do sistema baixa automaticamente os modelos `hand_landmarker.task`,
+`gesture_recognizer.task` e `pose_landmarker_lite.task` para `models/`. Para usar
+um arquivo já baixado, defina
 `MEDIAPIPE_HAND_LANDMARKER_MODEL` com o caminho completo do modelo antes de
 executar o sistema.
+
+O teste de setup combina `Hand Landmarker`, `Gesture Recognizer` e `Pose
+Landmarker`. Ele mostra landmarks das mãos, lado e orientação, gesto
+pré-treinado e a quantidade de landmarks corporais detectados. Esses recursos
+servem para diagnóstico; o reconhecimento dos sinais de Libras continua sendo
+feito pelos modelos treinados do projeto.
 
 O treinamento salva o modelo em `data/generated_model/modelo_libras.pkl` e as
 características numéricas em `data/generated_model/dados_libras.npz`. As

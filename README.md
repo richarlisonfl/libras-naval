@@ -101,9 +101,11 @@ O arquivo `detection_system/main.py` oferece:
 
 1. Reconhecimento em tempo real
 2. Treinamento
-3. Captura de imagens para treinamento
-4. Teste de câmera e MediaPipe
-5. Saída
+3. Teste de câmera e MediaPipe
+4. Saída
+
+O treinamento pode ser feito sinal por sinal, nos modos estático e dinâmico.
+Consulte o [checklist de treinamento](checklist.md) antes da coleta.
 
 ## Teste de instalação
 
@@ -115,7 +117,7 @@ cd detection_system
 .venv/bin/python -c "import cv2, mediapipe, websockets; print('Dependências principais OK')"
 ```
 
-Para testar câmera e MediaPipe pelo menu, execute `python main.py` e escolha a opção `4`.
+Para testar câmera e MediaPipe pelo menu, execute `python main.py` e escolha a opção `3`.
 
 ## Câmeras
 
@@ -170,12 +172,13 @@ O sistema coleta características da mão diretamente da câmera. Para cada clas
 
 O sistema percorre as imagens de cada pasta, detecta a mão com MediaPipe e processa também a versão espelhada da imagem.
 
-Cada mão gera 67 características:
+Cada mão gera 68 características:
 
 ```text
 21 pontos x 3 coordenadas (x, y, z) = 63
 4 ângulos dos dedos = 4
-Total = 67 características
+1 componente de orientação da palma = 1
+Total = 68 características
 ```
 
 O classificador usado é um `SVC` com kernel `RBF`. Os dados são normalizados com `StandardScaler` e divididos em treinamento e teste.
@@ -227,14 +230,15 @@ Escolha `1. Reconhecimento em Tempo Real` no menu. O sistema:
 
 1. Abre a câmera escolhida.
 2. Detecta os pontos da mão.
-3. Extrai as 67 características.
+3. Extrai as 68 características.
 4. Normaliza os dados com o normalizador salvo.
 5. Faz a previsão com o modelo.
 6. Envia previsões de alta confiança pelo WebSocket quando disponível.
 
 Pressione `Q` na janela da câmera para sair.
 
-O reconhecimento atual é voltado principalmente para sinais estáticos. Ele não modela sequências temporais ou movimentos complexos ao longo de vários quadros.
+O reconhecimento possui modos estático e dinâmico. O modo dinâmico usa uma
+janela temporal de landmarks e é indicado para sinais com movimento, como `J`.
 
 ## Servidor e WebSocket
 

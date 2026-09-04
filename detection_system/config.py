@@ -9,7 +9,8 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Configurações do sistema
 CONFIG = {
-    'dimensao_imagem': (640, 480),
+    # 'dimensao_imagem': (640, 480),
+    'dimensao_imagem': (1280, 720),
     'fps_camera': 30,
     'numero_amostras_por_classe': 100,
     'limite_confianca': 0.32,

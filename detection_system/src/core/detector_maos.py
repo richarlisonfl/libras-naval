@@ -32,6 +32,10 @@ class DetectorMaos:
 
     def __init__(self):
         caminho_modelo = self._obter_caminho_modelo()
+        self.maos = _ProcessadorMaos(self._criar_landmarker(caminho_modelo))
+
+    @staticmethod
+    def _criar_landmarker(caminho_modelo):
         opcoes = vision.HandLandmarkerOptions(
             base_options=python.BaseOptions(model_asset_path=str(caminho_modelo)),
             running_mode=vision.RunningMode.VIDEO,
@@ -40,7 +44,7 @@ class DetectorMaos:
             min_hand_presence_confidence=0.7,
             min_tracking_confidence=0.5,
         )
-        self.maos = _ProcessadorMaos(vision.HandLandmarker.create_from_options(opcoes))
+        return vision.HandLandmarker.create_from_options(opcoes)
 
     def _obter_caminho_modelo(self):
         caminho_configurado = os.environ.get("MEDIAPIPE_HAND_LANDMARKER_MODEL")
@@ -67,56 +71,55 @@ class DetectorMaos:
         """Extrai coordenadas dos pontos e ângulos da mão."""
         caracteristicas = []
 
-        for marco in marcos_mao.landmark:
-            caracteristicas.extend((marco.x, marco.y, marco.z))
+        for ponto in marcos_mao.landmark:
+            caracteristicas.extend((ponto.x, ponto.y, ponto.z))
 
         caracteristicas.extend(self._calcular_angulos(marcos_mao))
+        _, orientacao = self._componente_orientacao(marcos_mao)
+        caracteristicas.append(orientacao)
         return np.array(caracteristicas, dtype=float)
 
     def estimar_orientacao(self, marcos_mao, lado=None):
         """Estima se a palma ou as costas da mão estão voltadas para a câmera."""
-        pontos = marcos_mao.landmark
-        pulso = np.array([pontos[0].x, pontos[0].y, pontos[0].z])
-        base_indicador = np.array([pontos[5].x, pontos[5].y, pontos[5].z])
-        base_mindinho = np.array([pontos[17].x, pontos[17].y, pontos[17].z])
-
-        normal = np.cross(base_indicador - pulso, base_mindinho - pulso)
-        tamanho_normal = np.linalg.norm(normal)
-        if tamanho_normal < 1e-8:
-            return "INDEFINIDA", 0.0
-
-        componente_camera = normal[2] / tamanho_normal
+        _, componente_camera = self._componente_orientacao(marcos_mao, lado)
         confianca = min(abs(componente_camera), 1.0)
         if confianca < 0.25:
             return "INDEFINIDA", confianca
 
-        orientacao = "COSTAS" if componente_camera < 0 else "PALMA"
-        if lado == "Left":
-            orientacao = "PALMA" if orientacao == "COSTAS" else "COSTAS"
+        orientacao = "PALMA" if componente_camera < 0 else "COSTAS"
         return orientacao, confianca
 
-    @staticmethod
-    def corrigir_lado(lado):
-        """Converte o lado retornado para a convenção física da câmera."""
-        if lado == "Left":
-            return "Right"
+
+    def _componente_orientacao(self, marcos_mao, lado=None):
+        """Retorna o lado e a componente da normal corrigida para a câmera."""
+        pontos = marcos_mao.landmark
+        pulso = np.array([pontos[0].x, pontos[0].y, pontos[0].z])
+        base_indicador = np.array([pontos[5].x, pontos[5].y, pontos[5].z])
+        base_mindinho = np.array([pontos[17].x, pontos[17].y, pontos[17].z])
+        vetor_normal = np.cross(base_indicador - pulso, base_mindinho - pulso)
+        tamanho_vetor_normal = np.linalg.norm(vetor_normal)
+        if tamanho_vetor_normal < 1e-8:
+            return "INDEFINIDA", 0.0
+
+        componente = vetor_normal[2] / tamanho_vetor_normal
+        lado = lado or getattr(marcos_mao, "lado", None)
         if lado == "Right":
-            return "Left"
-        return lado
+            componente *= -1
+        return lado, componente
 
     def _calcular_angulos(self, marcos_mao):
         """Calcula os ângulos definidos entre os pontos dos dedos."""
         pontos = marcos_mao.landmark
         angulos = []
 
-        for indice_inicio, indice_meio, indice_fim in self.ANGULOS_PONTOS:
+        for indice_inicio, indice_articulacao, indice_fim in self.ANGULOS_PONTOS:
             vetor_inicio = np.array([
-                pontos[indice_inicio].x - pontos[indice_meio].x,
-                pontos[indice_inicio].y - pontos[indice_meio].y,
+                pontos[indice_inicio].x - pontos[indice_articulacao].x,
+                pontos[indice_inicio].y - pontos[indice_articulacao].y,
             ])
             vetor_fim = np.array([
-                pontos[indice_fim].x - pontos[indice_meio].x,
-                pontos[indice_fim].y - pontos[indice_meio].y,
+                pontos[indice_fim].x - pontos[indice_articulacao].x,
+                pontos[indice_fim].y - pontos[indice_articulacao].y,
             ])
 
             produto_escalar = np.dot(vetor_inicio, vetor_fim)
@@ -144,6 +147,8 @@ class DetectorMaos:
 
 
 class _ProcessadorMaos:
+    LADO_FRAME_ESPELHADO_PARA_FISICO = {"Left": "Right", "Right": "Left"}
+
     def __init__(self, landmarker):
         self._landmarker = landmarker
         self._timestamp_ms = 0
@@ -152,25 +157,33 @@ class _ProcessadorMaos:
         imagem = mp.Image(image_format=mp.ImageFormat.SRGB, data=imagem_rgb)
         resultado = self._landmarker.detect_for_video(imagem, self._timestamp_ms)
         self._timestamp_ms += 1
+        lados = [
+            self.LADO_FRAME_ESPELHADO_PARA_FISICO.get(
+                classificacao[0].category_name,
+                classificacao[0].category_name,
+            )
+            if classificacao else None
+            for classificacao in resultado.handedness
+        ]
+        landmarks = [
+            SimpleNamespace(landmark=pontos_mao, lado=lado)
+            for pontos_mao, lado in zip(resultado.hand_landmarks, lados)
+        ]
         return SimpleNamespace(
-            multi_hand_landmarks=[
-                SimpleNamespace(landmark=landmarks)
-                for landmarks in resultado.hand_landmarks
-            ],
+            multi_hand_landmarks=landmarks,
             multi_handedness=[
                 [
                     SimpleNamespace(
-                        category_name=DetectorMaos.corrigir_lado(
-                            classificacao.category_name
-                        ),
-                        score=classificacao.score,
+                        category_name=lado,
+                        score=classificacao[0].score,
                     )
-                    for classificacao in classificacoes
                 ]
-                for classificacoes in resultado.handedness
+                for lado, classificacao in zip(
+                    [landmark.lado for landmark in landmarks], resultado.handedness
+                )
             ],
             multi_hand_world_landmarks=[
-                SimpleNamespace(landmark=landmarks)
-                for landmarks in resultado.hand_world_landmarks
+                SimpleNamespace(landmark=pontos_mao)
+                for pontos_mao in resultado.hand_world_landmarks
             ],
         )
