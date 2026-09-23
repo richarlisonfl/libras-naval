@@ -38,6 +38,7 @@ class ClassificadorTemporal:
         ))
 
     def treinar(self, sequencias, rotulos):
+        rotulos = list(rotulos)
         if len(sequencias) != len(rotulos):
             raise ValueError("A quantidade de sequências e rótulos deve ser igual.")
         if len(set(rotulos)) < 2:
@@ -52,8 +53,9 @@ class ClassificadorTemporal:
         self.decoder_rotulos = {indice: classe for classe, indice in encoder.items()}
         rotulos_numericos = np.array([encoder[rotulo] for rotulo in rotulos])
         dados = self.scaler.fit_transform(dados)
+        test_size = max(0.2, len(classes) / len(rotulos_numericos))
         treino, teste, y_treino, y_teste = train_test_split(
-            dados, rotulos_numericos, test_size=0.2, random_state=42,
+            dados, rotulos_numericos, test_size=test_size, random_state=42,
             stratify=rotulos_numericos,
         )
         self.modelo = SVC(kernel="rbf", probability=True, random_state=42)
@@ -71,14 +73,19 @@ class ClassificadorTemporal:
     def salvar(self, sequencias, rotulos):
         caminho = config.CONFIG["caminho_modelos"]
         os.makedirs(caminho, exist_ok=True)
+        self.salvar_dados(sequencias, rotulos)
+        with open(os.path.join(caminho, self.MODELO), "wb") as arquivo:
+            pickle.dump({"modelo": self.modelo, "scaler": self.scaler,
+                         "decoder": self.decoder_rotulos}, arquivo)
+
+    def salvar_dados(self, sequencias, rotulos):
+        caminho = config.CONFIG["caminho_modelos"]
+        os.makedirs(caminho, exist_ok=True)
         np.savez_compressed(
             os.path.join(caminho, self.DADOS),
             sequencias=np.asarray(sequencias, dtype=float),
             rotulos=np.asarray(rotulos),
         )
-        with open(os.path.join(caminho, self.MODELO), "wb") as arquivo:
-            pickle.dump({"modelo": self.modelo, "scaler": self.scaler,
-                         "decoder": self.decoder_rotulos}, arquivo)
 
     def carregar(self):
         caminho = os.path.join(config.CONFIG["caminho_modelos"], self.MODELO)

@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "./api.js";
+import { apiGet } from "./api.js";
 
 // Elementos DOM
 const gradeNomes = document.getElementById('grade-nomes');

@@ -22,42 +22,6 @@ app.get('/get-nickname', async (req, res) => {
   res.status(200)
 })
 
-app.post('/save-game', async (req, res) => {
-  try{
-    console.log(req.body)
-    const user = await context.getUserByNickname(req.body.nickname);
-
-    let nickname = req.body.nickname
-    if (user.length != 0)
-    {
-      res.sendStatus(200)
-      return;
-    }
-
-    const userResult = await context.insertUser(nickname, req.body.time);
-
-    for (let cell of req.body.cells)
-    {
-      await context.insertCell(userResult[0].insertId, cell);
-    }
-
-    res.sendStatus(200)
-  } catch (error) {
-    res.statusCode = 400;
-    res.body = error;
-  }
-})
-
-app.get('/get-rank', async (req,res) => {
-  try {
-      res.send({ rank: await context.getRank()});
-  res.status(200)
-  } catch (error) {
-    res.statusCode = 400;
-    res.body = error;
-  }
-})
-
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

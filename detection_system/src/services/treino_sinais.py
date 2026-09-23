@@ -120,10 +120,10 @@ class TreinoSinais:
         sequencias, rotulos = classificador.carregar_dados()
         sequencias.extend(sequencias_novas)
         rotulos.extend([sinal] * len(sequencias_novas))
-        classificador.salvar(sequencias, rotulos)
         classificador.atualizar_catalogo(sinal, "dinamico", pessoa)
         if len(set(rotulos)) < 2:
             print("Sequência salva. Treine outro sinal para gerar o modelo dinâmico.")
+            classificador.salvar_dados(sequencias, rotulos)
             return None
         precisao = classificador.treinar(sequencias, rotulos)
         classificador.salvar(sequencias, rotulos)

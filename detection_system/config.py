@@ -9,17 +9,16 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Configurações do sistema
 CONFIG = {
-    # 'dimensao_imagem': (640, 480),
-    'dimensao_imagem': (1280, 720),
+    'dimensao_imagem': (640, 480),
     'fps_camera': 30,
-    'numero_amostras_por_classe': 100,
-    'limite_confianca': 0.32,
-    'caminho_dados': os.path.join(BASE_DIR, 'data', 'to_training'),
-    'caminho_modelos': os.path.join(BASE_DIR, 'data', 'generated_model'),
-    'classes_treinamento': 'AEIOU',
-    'numeros_treinamento': '012345'
+    'limite_confianca': 0.60,
+    'janela_dinamica': 45,
+    'limiar_movimento': 0.008,
+    'limite_confianca_dinamico': 0.55,
+    'limite_confianca_envio': 0.80,
+    'intervalo_envio_sinal': 3.0,
+    'caminho_modelos': os.path.join(BASE_DIR, 'data', 'generated_model')
 }
 
 # Criar diretórios se não existirem
-os.makedirs(CONFIG['caminho_dados'], exist_ok=True)
 os.makedirs(CONFIG['caminho_modelos'], exist_ok=True)

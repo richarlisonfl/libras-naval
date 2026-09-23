@@ -44,13 +44,14 @@ class ReconhecimentoApp:
 
         Retorna True se o modelo foi carregado com sucesso.
         """
-        from src.services.reconhecedor import ReconhecedorLibras
+        from src.services.reconhecimento_hibrido import ReconhecimentoHibrido
 
         print(" Carregando componentes...")
-        self.reconhecedor = ReconhecedorLibras(indice_camera=self.camera)
+        self.reconhecedor = ReconhecimentoHibrido(camera=self.camera)
 
-        print(" Carregando modelo treinado...")
-        return self.reconhecedor.carregar_modelo()
+        print(" Carregando modelos treinados...")
+        self.modelos_carregados = self.reconhecedor.carregar_modelos()
+        return any(self.modelos_carregados)
 
     def run(self):
         """Executa o fluxo de reconhecimento (carregamento + execução)."""
@@ -61,12 +62,12 @@ class ReconhecimentoApp:
         try:
             loaded = self._load_components()
             if loaded:
-                print(f" Modelo carregado - {len(self.reconhecedor.classificador.decoder_rotulos)} classes")
+                print(" Pelo menos um modelo foi carregado.")
                 print(" Iniciando câmera em 3 segundos...")
                 print(" Mostre os sinais para testar!")
                 import time
                 time.sleep(3)
-                self.reconhecedor.executar_reconhecimento()
+                self.reconhecedor.executar()
             else:
                 print(" Modelo não encontrado!")
                 print(" Execute: python main.py (e selecione a opção de treinamento)")

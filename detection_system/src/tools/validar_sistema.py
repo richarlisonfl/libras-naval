@@ -8,7 +8,8 @@ import os
 import subprocess
 
 # Adicionar o diretório atual ao path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, BASE_DIR)
 
 def verificar_modulo(nome_modulo, nome_pacote=None):
     """Verifica se um módulo está instalado"""
@@ -27,15 +28,16 @@ def verificar_arquivos():
     """Verifica se os arquivos principais existem"""
     arquivos_necessarios = [
         'main.py',
-        'src/apps/treinamento_app.py',
         'src/apps/reconhecimento_app.py',
         'src/core/__init__.py',
-        'src/core/coletor_dados.py',
         'src/core/classificador.py',
-        'src/services/reconhecedor.py',
+        'src/core/classificador_temporal.py',
+        'src/services/reconhecimento_hibrido.py',
+        'src/services/treino_sinais.py',
+        'src/services/websocket.py',
         'src/core/detector_maos.py',
         'config.py',
-        'teste_rapido.py'
+        'src/tools/teste_rapido.py'
     ]
 
     print("\n" + "="*60)
@@ -44,7 +46,7 @@ def verificar_arquivos():
 
     todos_existem = True
     for arquivo in arquivos_necessarios:
-        if os.path.exists(arquivo):
+        if os.path.exists(os.path.join(BASE_DIR, arquivo)):
             print(f" {arquivo}: OK")
         else:
             print(f" {arquivo}: NÃO ENCONTRADO")
@@ -93,17 +95,10 @@ def verificar_imports():
         return False
 
     try:
-        from src.services.reconhecedor import ReconhecedorLibras
-        print(" ReconhecedorLibras: OK")
+        from src.services.reconhecimento_hibrido import ReconhecimentoHibrido
+        print(" ReconhecimentoHibrido: OK")
     except Exception as e:
-        print(f" ReconhecedorLibras: {e}")
-        return False
-
-    try:
-        from src.core.coletor_dados import ColetorDadosLibras
-        print(" ColetorDadosLibras: OK")
-    except Exception as e:
-        print(f" ColetorDadosLibras: {e}")
+        print(f" ReconhecimentoHibrido: {e}")
         return False
 
     return True
@@ -118,8 +113,6 @@ def verificar_config():
         import config
         print(f" Config carregada: OK")
         print(f"   - Dimensão imagem: {config.CONFIG['dimensao_imagem']}")
-        print(f"   - Amostras por classe: {config.CONFIG['numero_amostras_por_classe']}")
-        print(f"   - Caminho dados: {config.CONFIG['caminho_dados']}")
         print(f"   - Limite confiança: {config.CONFIG['limite_confianca']}")
         return True
     except Exception as e:

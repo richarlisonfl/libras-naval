@@ -12,16 +12,4 @@ async function apiGet(endpoint) {
   }
 }
 
-// Função POST genérica
-async function apiPost(endpoint, payload) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}${endpoint}`, payload);
-    return response.data;
-  } catch (error) {
-    console.error("Erro no POST:", error);
-    throw error;
-  }
-}
-
-// Exportando para uso em outros scripts
-export { apiGet, apiPost };
+export { apiGet };

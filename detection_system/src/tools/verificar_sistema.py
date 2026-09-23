@@ -18,9 +18,11 @@ print("=" * 50)
 # Verificar arquivos necessários
 arquivos_necessarios = [
     'src/core/__init__.py',
-    'src/core/coletor_dados.py',
     'src/core/classificador.py',
-    'src/services/reconhecedor.py',
+    'src/core/classificador_temporal.py',
+    'src/services/reconhecimento_hibrido.py',
+    'src/services/treino_sinais.py',
+    'src/services/websocket.py',
     'src/core/detector_maos.py',
     'config.py',
     'src/apps/reconhecimento_app.py'
@@ -41,7 +43,7 @@ if os.path.exists(os.path.join(config.CONFIG['caminho_modelos'], 'modelo_libras.
     print(" Pode executar: python src/apps/reconhecimento_app.py")
 else:
     print(" Modelo não encontrado.")
-    print(" Execute primeiro: python src/apps/treinamento_app.py")
+    print(" Execute primeiro: python main.py e escolha Treinamento")
 
 # Verificar dependências
 print("\n Verificando dependências...")

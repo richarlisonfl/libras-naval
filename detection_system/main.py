@@ -15,9 +15,8 @@ if BASE_DIR not in sys.path:
 
 import config
 from src.core.camera import Camera
-from src.apps.reconhecimento_app import ReconhecimentoApp
 from src.services.treino_sinais import TreinoSinais
-from src.services.reconhecimento_dinamico import ReconhecimentoDinamico
+from src.services.reconhecimento_hibrido import ReconhecimentoHibrido
 
 
 def limpar_tela():
@@ -115,14 +114,7 @@ def executar_reconhecimento():
         return
     
     try:
-        modo = input("Escolha o modo (1-estático, 2-dinâmico): ").strip()
-        if modo == "2":
-            resultado = ReconhecimentoDinamico(camera=indice_camera).executar()
-            print("\n Reconhecimento dinâmico finalizado!" if resultado else "\n Modelo dinâmico indisponível.")
-            return
-
-        reconhecimento = ReconhecimentoApp(camera=indice_camera)
-        resultado = reconhecimento.run()
+        resultado = ReconhecimentoHibrido(camera=indice_camera).executar()
         
         if resultado:
             print("\n Reconhecimento finalizado!")

@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "./api.js";
+import { apiGet } from "./api.js";
 
 const WS_URL = 'ws://localhost:8765';
 let ws = null;
@@ -45,32 +45,6 @@ function handleMessage(message){
 
     if (message === 'salvar')
     {
-        let cells = [];
-        for (let linha = 1; linha <= linhas; linha++) {
-            for (let coluna of colunas) {
-                let id = `cell-${linha}-${coluna}`;
-                let cell = document.getElementById(id);
-                if (cell) {
-                    const navio = navios.includes(id);
-                    const estado = cell.classList.value;
-                    let estadoId;
-                    
-                    if (estado === 'acerto' || estado === 'erro')
-                        estadoId = 1;
-                    else 
-                        estadoId = 2;
-                    
-                    cells.push({
-                        linha: linha,
-                        coluna: coluna,
-                        navio: navio,
-                        estadoId: estadoId
-                    })
-                }
-            }
-        }
-
-        apiPost('/save-game', {nickname: localStorage.getItem("apelido"), cells})
     }
 
     if (message === 'ok' && coluna != undefined && linha != undefined)

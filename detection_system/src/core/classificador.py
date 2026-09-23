@@ -34,6 +34,7 @@ class ClassificadorLibras:
 
     def treinar(self, dados, rotulos, test_size=0.2, grupos=None):
         """Treina o modelo de classificação"""
+        rotulos = list(rotulos)
         if len(dados) != len(rotulos):
             raise ValueError("A quantidade de dados e rótulos deve ser igual.")
 
@@ -45,6 +46,8 @@ class ClassificadorLibras:
             raise ValueError("Cada classe precisa de pelo menos duas amostras.")
 
         X, y = self.preparar_dados(dados, rotulos)
+        classes = len(set(y))
+        test_size = max(test_size, classes / len(y))
 
         if grupos is None:
             X_treino, X_teste, y_treino, y_teste = train_test_split(

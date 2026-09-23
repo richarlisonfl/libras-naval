@@ -86,13 +86,14 @@ python -m pip install -r "$REQ_FILE" || {
 # Encerramento limpo ao pressionar Ctrl+C
 ###############################################
 cleanup() {
+    STATUS="${1:-0}"
     echo -e "\nEncerrando processos..."
 
     [ -n "$SERVER_PID" ] && kill "$SERVER_PID" 2>/dev/null
     [ -n "$RECON_PID" ] && kill "$RECON_PID" 2>/dev/null
 
     echo "Todos os processos foram encerrados."
-    exit 0
+    exit "$STATUS"
 }
 
 trap cleanup SIGINT
@@ -109,16 +110,12 @@ SERVER_PID=$!
 echo "Servidor HTTP PID: $SERVER_PID"
 
 ###############################################
-# 5) Iniciar script de reconhecimento
+# 5) Iniciar menu principal do sistema Python
 ###############################################
 cd "$BASE_DIR" || exit 1
 
-echo "Iniciando script de reconhecimento..."
-# Use o python do venv para garantir as dependências corretas
-"$VENV_DIR/bin/python" detection_system/src/apps/reconhecimento_app.py &
-RECON_PID=$!
-echo "Reconhecimento PID: $RECON_PID"
-
-echo "Pressione Ctrl+C para encerrar ambos os processos."
-
-wait
+echo "Iniciando menu principal do sistema..."
+# O menu precisa permanecer em primeiro plano para receber as opções digitadas.
+"$VENV_DIR/bin/python" detection_system/main.py
+RECON_STATUS=$?
+cleanup "$RECON_STATUS"
