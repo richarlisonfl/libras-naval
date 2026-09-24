@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrasNaval - Faixa etária</title>
+    <link rel="stylesheet" href="faixa_etaria.css">
+    <!-- VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+</head>
+<body>
+    <!-- Widget VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <main class="container-escolha">
+        <section class="area-faixa-etaria">
+            <div class="instrucoes-escolha">
+                <h2>Selecione sua faixa etária</h2>
+                <p>Faça o sinal do número correspondente, depois faça o sinal de confirmação e, por último, o sinal para iniciar o jogo.</p>
+            </div>
+            
+            <div class="container-faixas-etarias">
+                <div class="grade-wrapper">
+                    <div class="grade-container">
+                        <div class="coluna-linhas">
+                            <div class="numero-linha">1</div>
+                            <div class="numero-linha">2</div>
+                            <div class="numero-linha">3</div>
+                            <div class="numero-linha">4</div>
+                            <div class="numero-linha">5</div>
+                        </div>
+                        
+                        <div class="grade-faixas-etarias" id="grade-faixas-etarias">
+                            <div class="celula-faixa" data-faixa="1">Até 6 anos</div>
+                            <div class="celula-faixa" data-faixa="2">7 a 10 anos</div>
+                            <div class="celula-faixa" data-faixa="3">11 a 14 anos</div>
+                            <div class="celula-faixa" data-faixa="4">15 a 17 anos</div>
+                            <div class="celula-faixa" data-faixa="5">18 anos ou mais</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="area-confirmacao">
+                <div class="faixa-selecionada-container">
+                    <span class="label-faixa">Faixa etária escolhida:</span>
+                    <div class="faixa-selecionada" id="faixa-selecionada">
+                        Aguardando seleção...
+                    </div>
+                </div>
+                
+                <button class="btn-confirmar" id="btn-confirmar" disabled>
+                    Confirmar faixa etária
+                </button>
+                
+                <p class="dica-libras">
+                    Dica: faça um número de 1 a 5, depois "ok" e "iniciar"
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="faixa_etaria.js"></script>
+    <script>
+        // Inicializar VLibras
+        if (typeof VLibras !== 'undefined') {
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+    </script>
+</body>
+</html>
