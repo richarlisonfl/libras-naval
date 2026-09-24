@@ -11,17 +11,30 @@
 <body>
 
     <div class="painel-lateral">
-        <div id="div-tempo">...</div>
-        <div id="div-coluna"></div>
-        <div id="div-linha"></div>
-        <div id="div-navios"></div>
+        <div class="painel-titulo">Status da partida</div>
+        <div class="painel-tempo">
+            <span class="painel-legenda">Tempo</span>
+            <strong id="div-tempo">00:00:00</strong>
+        </div>
+        <div class="painel-secao">
+            <span class="painel-legenda">Jogada atual</span>
+            <div class="painel-jogada">
+                <span id="div-coluna">Coluna: -</span>
+                <span id="div-linha">Linha: -</span>
+            </div>
+        </div>
+        <div class="painel-secao painel-navios">
+            <span class="painel-legenda">Frota</span>
+            <strong id="div-navios-restantes">Navios restantes: 0</strong>
+            <span id="div-navios-total">Total de navios: 0</span>
+        </div>
     </div>
     
     <div class="container-principal">
         <div class="conteudo-superior">
             <h1 class="titulo">LibrasNaval</h1>
             <p>Jogo desenvolvido pela turma de TADS 2024 - IFPA Campus Paragominas</p>
-            <p>Jogando como <b><span id="apelido-jogador">...</span></b></p>
+            <p>Faixa etária: <b><span id="faixa-etaria-jogador">...</span></b></p>
         </div>
         
         <div class="container-tabuleiro">
@@ -89,7 +102,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="module" src="game.js"></script>
 </body>
 </html>

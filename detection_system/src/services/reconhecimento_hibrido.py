@@ -26,6 +26,9 @@ class ReconhecimentoHibrido:
         self.caracteristicas_anteriores = None
         self.ultima_previsao_enviada = None
         self.tempo_ultima_previsao = 0.0
+        self.inicio_enviado = False
+        self.inicio_pendente = False
+        self._avisou_ily_sem_cliente = False
         try:
             self.websocket_server = websocket.WebsocketServer()
         except Exception as erro:
@@ -86,11 +89,46 @@ class ReconhecimentoHibrido:
         self.ultima_previsao_enviada = previsao
         self.tempo_ultima_previsao = agora
 
+    def _verificar_gesto_iniciar(self, imagem_rgb):
+        if self.inicio_enviado:
+            return "desativado", 0.0
+
+        clientes_conectados = (
+            self.websocket_server is not None
+            and bool(self.websocket_server.connected_clients)
+        )
+        if self.inicio_pendente and clientes_conectados:
+            print("WebSocket conectado; enviando ILY pendente.")
+            self.websocket_server.send_message("iniciar")
+            self.inicio_enviado = True
+            self.inicio_pendente = False
+            return "enviado", 1.0
+
+        gesto, confianca = self.detector.reconhecer_gesto(imagem_rgb)
+        gesto_normalizado = gesto.lower().replace("_", "").replace("-", "")
+        if (
+            not self.inicio_enviado
+            and gesto_normalizado == "iloveyou"
+            and confianca >= config.CONFIG["limite_confianca_iniciar"]
+        ):
+            print(
+                f"ILY detectado: confiança={confianca:.3f}; "
+                f"clientes WebSocket={int(clientes_conectados)}"
+            )
+            if clientes_conectados:
+                self.websocket_server.send_message("iniciar")
+                self.inicio_enviado = True
+            else:
+                self.inicio_pendente = True
+                if not self._avisou_ily_sem_cliente:
+                    print("ILY aguardando conexão do navegador.")
+                    self._avisou_ily_sem_cliente = True
+        return gesto, confianca
+
     def executar(self):
         modelo_estatico, modelo_dinamico = self.carregar_modelos()
         if not modelo_estatico and not modelo_dinamico:
-            print("Treine sinais estáticos ou dinâmicos antes do reconhecimento.")
-            return False
+            print("Nenhum modelo de sinais carregado; gesto ILY continua disponível.")
 
         camera = cv2.VideoCapture(self.camera)
         if not camera.isOpened():
@@ -109,8 +147,10 @@ class ReconhecimentoHibrido:
                 if not sucesso:
                     break
                 quadro = cv2.flip(quadro, 1)
+                quadro_rgb = cv2.cvtColor(quadro, cv2.COLOR_BGR2RGB)
+                gesto, confianca_gesto = self._verificar_gesto_iniciar(quadro_rgb)
                 resultado = self.detector.maos.process(
-                    cv2.cvtColor(quadro, cv2.COLOR_BGR2RGB)
+                    quadro_rgb
                 )
                 previsao, confianca, origem = "?", 0.0, "nenhum"
                 movimento = 0.0
@@ -151,6 +191,10 @@ class ReconhecimentoHibrido:
                 cv2.putText(
                     quadro, f"MOVIMENTO: {movimento:.4f} | Q encerra",
                     (15, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2,
+                )
+                cv2.putText(
+                    quadro, f"GESTO: {gesto} ({confianca_gesto:.1%})",
+                    (15, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2,
                 )
                 cv2.imshow("Reconhecimento de Libras", quadro)
                 if cv2.waitKey(1) & 0xFF == ord("q"):

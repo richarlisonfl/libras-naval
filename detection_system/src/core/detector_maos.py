@@ -15,6 +15,10 @@ class DetectorMaos:
         "https://storage.googleapis.com/mediapipe-models/hand_landmarker/"
         "hand_landmarker/float16/1/hand_landmarker.task"
     )
+    GESTOS_MODELO_URL = (
+        "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/"
+        "gesture_recognizer/float16/1/gesture_recognizer.task"
+    )
     CONEXOES_MAO = (
         (0, 1), (1, 2), (2, 3), (3, 4),
         (0, 5), (5, 6), (6, 7), (7, 8),
@@ -33,6 +37,8 @@ class DetectorMaos:
     def __init__(self):
         caminho_modelo = self._obter_caminho_modelo()
         self.maos = _ProcessadorMaos(self._criar_landmarker(caminho_modelo))
+        caminho_gestos = self._obter_caminho_modelo_gestos()
+        self.gestos = _ProcessadorGestos(self._criar_reconhecedor_gestos(caminho_gestos))
 
     @staticmethod
     def _criar_landmarker(caminho_modelo):
@@ -45,6 +51,18 @@ class DetectorMaos:
             min_tracking_confidence=0.5,
         )
         return vision.HandLandmarker.create_from_options(opcoes)
+
+    @staticmethod
+    def _criar_reconhecedor_gestos(caminho_modelo):
+        opcoes = vision.GestureRecognizerOptions(
+            base_options=python.BaseOptions(model_asset_path=str(caminho_modelo)),
+            running_mode=vision.RunningMode.VIDEO,
+            num_hands=1,
+            min_hand_detection_confidence=0.7,
+            min_hand_presence_confidence=0.7,
+            min_tracking_confidence=0.5,
+        )
+        return vision.GestureRecognizer.create_from_options(opcoes)
 
     def _obter_caminho_modelo(self):
         caminho_configurado = os.environ.get("MEDIAPIPE_HAND_LANDMARKER_MODEL")
@@ -66,6 +84,31 @@ class DetectorMaos:
                 "Defina MEDIAPIPE_HAND_LANDMARKER_MODEL com o caminho do modelo."
             ) from erro
         return caminho_modelo
+
+    def _obter_caminho_modelo_gestos(self):
+        caminho_configurado = os.environ.get("MEDIAPIPE_GESTURE_RECOGNIZER_MODEL")
+        caminho_modelo = Path(caminho_configurado) if caminho_configurado else (
+            Path(__file__).resolve().parents[2] / "models" / "gesture_recognizer.task"
+        )
+        if caminho_modelo.exists():
+            return caminho_modelo
+
+        caminho_modelo.parent.mkdir(parents=True, exist_ok=True)
+        caminho_temporario = caminho_modelo.with_suffix(".task.part")
+        try:
+            urllib.request.urlretrieve(self.GESTOS_MODELO_URL, caminho_temporario)
+            caminho_temporario.replace(caminho_modelo)
+        except Exception as erro:
+            caminho_temporario.unlink(missing_ok=True)
+            raise RuntimeError(
+                "Não foi possível obter o modelo gesture_recognizer.task. "
+                "Defina MEDIAPIPE_GESTURE_RECOGNIZER_MODEL com o caminho do modelo."
+            ) from erro
+        return caminho_modelo
+
+    def reconhecer_gesto(self, imagem_rgb):
+        """Retorna o gesto pré-treinado mais provável e sua confiança."""
+        return self.gestos.process(imagem_rgb)
 
     def extrair_caracteristicas(self, marcos_mao):
         """Extrai coordenadas dos pontos e ângulos da mão."""
@@ -187,3 +230,20 @@ class _ProcessadorMaos:
                 for pontos_mao in resultado.hand_world_landmarks
             ],
         )
+
+
+class _ProcessadorGestos:
+    def __init__(self, reconhecedor):
+        self._reconhecedor = reconhecedor
+        self._timestamp_ms = 0
+
+    def process(self, imagem_rgb):
+        imagem = mp.Image(image_format=mp.ImageFormat.SRGB, data=imagem_rgb)
+        resultado = self._reconhecedor.recognize_for_video(
+            imagem, self._timestamp_ms
+        )
+        self._timestamp_ms += 1
+        if not resultado.gestures:
+            return "?", 0.0
+        categoria = resultado.gestures[0][0]
+        return categoria.category_name, float(categoria.score)

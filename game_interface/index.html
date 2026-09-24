@@ -5,18 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibrasNaval - Início</title>
     <link rel="stylesheet" href="index.css">
-    <!-- VLibras -->
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
 </head>
 <body>
-    <!-- Widget VLibras -->
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
-        </div>
-    </div>
-
     <div class="container-principal">
         <div class="conteudo-superior">
             <h1 class="titulo">LibrasNaval</h1>
@@ -49,31 +39,6 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
-    <script>
-        // window.addEventListener("load", () => {
-        //     navigator.serviceWorker.register("/ws-sw.js")
-        //         .then(reg => console.log("Service worker registrado", reg))
-        //         .catch(err => console.error("Erro ao registrar SW:", err));
-        // });
-        
-        // Inicializar VLibras Widget
-        if (typeof VLibras !== 'undefined') {
-            new window.VLibras.Widget('https://vlibras.gov.br/app');
-        }
-        
-        // Espera VLibras carregar e mostra sinal de boas-vindas
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                if (window.Libras) {
-                    window.Libras.mostrarSinal('Bem-vindo ao LibrasNaval. Faça o sinal I Love You para começar.');
-                }
-            }, 3000); // Dá tempo para VLibras inicializar
-        });
-        
-    </script>
-    <script src="vlibras-sinais.js"></script> <!-- ADICIONE ESTE ARQUIVO -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="module" src="index.js"></script>
 </body>
 </html>

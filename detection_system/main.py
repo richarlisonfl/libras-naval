@@ -17,6 +17,7 @@ import config
 from src.core.camera import Camera
 from src.services.treino_sinais import TreinoSinais
 from src.services.reconhecimento_hibrido import ReconhecimentoHibrido
+from src.services.reconhecimento_navegador import ReconhecimentoNavegador
 
 
 def limpar_tela():
@@ -40,7 +41,8 @@ def exibir_menu_principal():
     print("1. Reconhecimento")
     print("2. Treinamento")
     print("3. Teste de Setup (Câmera + MediaPipe)")
-    print("4. Sair")
+    print("4. Reconhecimento pela câmera do navegador")
+    print("5. Sair")
     print("-" * 60)
 
 
@@ -192,6 +194,12 @@ def menu_principal():
             executar_teste_setup()
             pausar_menu()
         elif opcao == "4":
+            try:
+                ReconhecimentoNavegador().executar()
+            except Exception as erro:
+                print(f"\n Erro no reconhecimento web: {erro}")
+            pausar_menu()
+        elif opcao == "5":
             print("\n" + "="*60)
             print("Obrigado por usar o Sistema de LibrasNaval!")
             print("="*60 + "\n")

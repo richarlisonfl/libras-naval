@@ -11,13 +11,14 @@ class WebsocketServer:
     - Exponibiliza `send_message` (thread-safe) para enviar a todos os clientes.
     """
 
-    def __init__(self, host='localhost', port=8765):
+    def __init__(self, host='localhost', port=8765, message_callback=None):
         self.host = host
         self.port = port
         self.connected_clients = set()
         self._loop = None
         self._thread = None
         self._server = None
+        self.message_callback = message_callback
         self._start()
 
     async def _handler(self, websocket, path=None):
@@ -27,8 +28,12 @@ class WebsocketServer:
         try:
             async for message in websocket:
                 print(f"Mensagem recebida: {message}")
-                # ecoa por enquanto
-                await websocket.send(f"Você disse: {message}")
+                if self.message_callback is not None:
+                    resposta = self.message_callback(message)
+                    if resposta is not None:
+                        await websocket.send(resposta)
+                else:
+                    await websocket.send(f"Você disse: {message}")
         except websockets.ConnectionClosed:
             print("Cliente desconectou.")
         finally:
@@ -55,9 +60,15 @@ class WebsocketServer:
 
     async def _broadcast(self, message):
         if not self.connected_clients:
-            print("Nenhum cliente conectado para enviar mensagem.")
-            return
-        await asyncio.gather(*(client.send(message) for client in self.connected_clients), return_exceptions=True)
+            print(f"WebSocket: nenhum cliente conectado; mensagem descartada: {message}")
+            return False
+        clientes = tuple(self.connected_clients)
+        print(f"WebSocket: enviando '{message}' para {len(clientes)} cliente(s).")
+        resultados = await asyncio.gather(
+            *(client.send(message) for client in clientes),
+            return_exceptions=True,
+        )
+        return not any(isinstance(resultado, Exception) for resultado in resultados)
 
     def send_message(self, message):
         """Envia `message` para todos os clientes conectados de forma thread-safe."""
@@ -65,9 +76,20 @@ class WebsocketServer:
             print("Loop do servidor não iniciado.")
             return
         try:
-            asyncio.run_coroutine_threadsafe(self._broadcast(message), self._loop)
+            futuro = asyncio.run_coroutine_threadsafe(
+                self._broadcast(message), self._loop
+            )
+            futuro.add_done_callback(self._registrar_resultado_envio)
         except Exception as e:
             print("Erro ao agendar broadcast:", e)
+
+    @staticmethod
+    def _registrar_resultado_envio(futuro):
+        try:
+            if not futuro.result():
+                print("WebSocket: envio não realizado.")
+        except Exception as erro:
+            print(f"WebSocket: erro no envio: {erro}")
 
     def stop(self):
         if self._loop is None:

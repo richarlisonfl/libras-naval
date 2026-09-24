@@ -1,4 +1,4 @@
-/* nome.css - Otimizado para 1600x900 sem rolagem */
+/* Estilos da seleção de faixa etária. */
 
 /* RESET para garantir medidas exatas */
 * {
@@ -44,7 +44,7 @@
 }
 
 /* Área principal de escolha - ALTURA CONTROLADA */
-.area-escolha-nome {
+.area-faixa-etaria {
     width: 100%;
     max-width: 1100px;
     height: 650px;
@@ -79,7 +79,7 @@
 }
 
 /* Container da grade com coordenadas */
-.container-grade-nomes {
+.container-faixas-etarias {
     flex: 1;
     width: 100%;
     display: flex;
@@ -90,7 +90,7 @@
     position: relative;
 }
 
-/* Grade de nomes 5x5 com coordenadas */
+/* Grade de cinco faixas etárias. */
 .grade-wrapper {
     display: flex;
     flex-direction: column;
@@ -159,8 +159,8 @@
     margin-bottom: 0;
 }
 
-/* Grade de nomes 5x5 */
-.grade-nomes {
+/* Grade de cinco faixas etárias. */
+.grade-faixas-etarias {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
@@ -168,8 +168,13 @@
     flex: 1;
 }
 
+.grade-faixas-etarias {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(5, 1fr);
+}
+
 /* Células da grade - COMPACTAS */
-.celula-nome {
+.celula-faixa {
     background-color: #8ab4f8;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -190,14 +195,14 @@
     line-height: 1.1;
 }
 
-.celula-nome:hover {
+.celula-faixa:hover {
     background-color: #235483;
     color: white;
     transform: translateY(-1px);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
-.celula-nome.selecionado {
+.celula-faixa.selecionado {
     background-color: #ffe28a;
     border-color: #81c995;
     color: #202124;
@@ -213,11 +218,11 @@
     margin-top: 10px;
 }
 
-.nome-selecionado-container {
+.faixa-selecionada-container {
     margin-bottom: 15px;
 }
 
-.label-nome {
+.label-faixa {
     display: block;
     color: #5f6368;
     font-size: 0.9rem;
@@ -225,7 +230,7 @@
     font-family: "Google Sans", arial, sans-serif;
 }
 
-.nome-selecionado {
+.faixa-selecionada {
     display: inline-block;
     background-color: #ffe28a;
     color: #202124;

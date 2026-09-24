@@ -1,5 +1,3 @@
-import { apiGet } from "./api.js";
-
 let reconnectInterval = 1000;
 let coluna = undefined, linha = undefined, acao = undefined;
 
@@ -72,7 +70,7 @@ async function handleMessage(message){
             linha = undefined;
         }
         
-        document.getElementById("div-navios").textContent = "Acertos: " + `${acertos}/${navios.length}`
+        atualizarContagemNavios();
         acao = undefined;
     }
 }
@@ -105,6 +103,16 @@ function clicarCelula(event) {
     } else {
         cell.classList.add("erro");
     }
+
+    atualizarContagemNavios();
+}
+
+function atualizarContagemNavios() {
+    const restantes = navios.length - acertos;
+    document.getElementById("div-navios-restantes").textContent =
+        `Navios restantes: ${restantes}`;
+    document.getElementById("div-navios-total").textContent =
+        `Total de navios: ${navios.length}`;
 }
 
 function ativarTabuleiro() {
@@ -129,6 +137,7 @@ async function carregarMapa() {
         navios = dados.mapas[indice].navios;
         
         console.log(`Mapa ${dados.mapas[indice].id} carregado`);
+        atualizarContagemNavios();
         ativarTabuleiro();
     } catch (erro) {
         alert("Erro ao carregar o mapa.");
@@ -152,7 +161,7 @@ function finalizarJogoComVitoria() {
 }
 
 // MODAL DE VITÓRIA
-async function criarModalVitoria() {
+function criarModalVitoria() {
     console.log('Criando modal de vitória...');
     
     const overlay = document.createElement('div');
@@ -186,7 +195,7 @@ async function criarModalVitoria() {
     `;
     
     modal.innerHTML = `
-        <h1 style="font-size: 3.5rem; margin: 0 0 20px 0; color: #202124;">Parabéns, ${localStorage.getItem("apelido")}!</h1>
+        <h1 style="font-size: 3.5rem; margin: 0 0 20px 0; color: #202124;">Parabéns!</h1>
 
         <div style="background-color: rgba(255, 255, 255, 0.9); 
                     padding: 20px; 
@@ -241,8 +250,15 @@ function redirecionarParaIndex() {
 // Adiciona console.log para debug
 console.log('game.js carregado. Aguardando jogo...');
 
-let span = document.getElementById('apelido-jogador')
-span.innerText = localStorage.getItem('apelido') ?? 'super'
+let span = document.getElementById('faixa-etaria-jogador')
+const faixasEtarias = {
+    '1': 'Até 6 anos',
+    '2': '7 a 10 anos',
+    '3': '11 a 14 anos',
+    '4': '15 a 17 anos',
+    '5': '18 anos ou mais'
+};
+span.innerText = faixasEtarias[localStorage.getItem('faixa_etaria')] ?? 'Não informada'
 
 let totalSegundos = 0;
 
@@ -260,6 +276,6 @@ setInterval(() => {
 
 document.getElementById("div-coluna").textContent = "Coluna: "
 document.getElementById("div-linha").textContent = "Linha: "
-document.getElementById("div-navios").textContent = "Acertos: " + `${acertos}/${navios.length}`
+atualizarContagemNavios();
 
 carregarMapa();
