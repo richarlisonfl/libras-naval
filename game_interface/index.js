@@ -8,6 +8,7 @@ worker.port.onmessage = (ev) => {
     const mensagem = ev.data.mensagem.toString().toLowerCase().trim(); 
     
     if (mensagem === "iniciar") {
+        console.log('Sinal ILY recebido. Abrindo seleção de faixa etária.');
         redirecionarParaEscolhaNome();
     }
 };
@@ -21,7 +22,7 @@ function atualizarTextoBotao(texto) {
 
 function redirecionarParaEscolhaNome() {
     // Redireciona imediatamente
-    window.location.href = 'nome.html';
+    window.location.href = 'faixa_etaria.html';
 }
 
 function iniciarModoLibras() {

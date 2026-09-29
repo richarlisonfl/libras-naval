@@ -13,7 +13,7 @@ class TradutorLibras {
             
             // Aguarda inicialização
             setTimeout(() => {
-                this.traduzirParaSinais('Sistema Libras Naval carregado.');
+                this.traduzirParaSinais('Sistema LibrasNaval carregado.');
             }, 2000);
         }
     }
@@ -60,7 +60,7 @@ window.Libras = {
     },
     
     mostrarBoasVindas: () => {
-        window.Libras.mostrarSinal('Bem-vindo ao Libras Naval. Jogo de Batalha Naval em Libras.');
+        window.Libras.mostrarSinal('Bem-vindo ao LibrasNaval. Jogo de Batalha Naval em Libras.');
     },
     
     mostrarInstrucoesInicio: () => {

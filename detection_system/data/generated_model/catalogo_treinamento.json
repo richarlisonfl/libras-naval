@@ -1,0 +1,26 @@
+{
+  "estatico:A": {
+    "sinal": "A",
+    "modo": "estatico",
+    "pessoas": [
+      "RICHARLISON"
+    ],
+    "sessoes": 1
+  },
+  "estatico:B": {
+    "sinal": "B",
+    "modo": "estatico",
+    "pessoas": [
+      "RICHARLISON"
+    ],
+    "sessoes": 1
+  },
+  "estatico:E": {
+    "sinal": "E",
+    "modo": "estatico",
+    "pessoas": [
+      "RICHARLISON"
+    ],
+    "sessoes": 1
+  }
+}
