@@ -14,8 +14,8 @@ O detector usa MediaPipe Tasks e o treinamento usa scikit-learn.
 ## Instalacao e execucao Linux
 
 ```bash
-chmod +x linux_start_game.sh
-./linux_start_game.sh
+chmod +x start.sh
+./start.sh
 ```
 
 Tambem e possivel executar somente o sistema Python:
@@ -55,7 +55,7 @@ Uma mao estavel favorece o modelo estatico; um movimento detectado favorece o mo
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
-.\\windows_start_game.ps1
+.\start.ps1
 ```
 
 ## Validacao
