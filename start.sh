@@ -1,121 +1,59 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# Caminho base do script (resolvido para caminho absoluto)
-BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
-# Ambiente virtual único do componente Python
+BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$BASE_DIR/detection_system/.venv"
-REQ_FILE="$BASE_DIR/detection_system/requirements.txt"
+VENV_PYTHON="$VENV_DIR/bin/python"
+SERVER_DIR="$BASE_DIR/game_server"
+NPM_STATE_FILE="$SERVER_DIR/node_modules/.libras-naval-dependencies"
 
-###############################################
-# Instalar Python 3.11 caso não exista
-###############################################
-instalar_python() {
-    echo "Python 3.11 não encontrado. Instalando..."
-
-    sudo apt update || { echo "Erro ao atualizar pacotes"; exit 1; }
-
-    sudo apt install -y software-properties-common build-essential zlib1g-dev \
-    libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev \
-    libffi-dev libsqlite3-dev wget curl llvm libbz2-dev liblzma-dev tk-dev
-
-    cd /usr/src || exit 1
-
-    sudo wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
-    sudo tar xzf Python-3.11.0.tgz
-    cd Python-3.11.0 || exit 1
-
-    sudo ./configure --enable-optimizations
-    sudo make -j"$(nproc)"
-    sudo make altinstall
-
-    echo "Python 3.11 instalado com sucesso."
+fail() {
+    printf 'Erro: %s\n' "$*" >&2
+    exit 1
 }
 
-###############################################
-# 1) Verificar Python 3.11
-###############################################
-if ! command -v python3.11 >/dev/null 2>&1; then
-    instalar_python
-else
-    echo "Python 3.11 encontrado: $(python3.11 --version)"
-fi
+[[ -x "$VENV_PYTHON" ]] || fail "Ambiente virtual não encontrado. Execute ./install.sh primeiro."
+"$VENV_PYTHON" -c 'import sys; sys.exit(sys.version_info[:2] != (3, 11))' \
+    || fail "O ambiente virtual não usa Python 3.11. Execute ./install.sh novamente."
+"$VENV_PYTHON" -c 'import cv2, mediapipe, numpy, sklearn, websockets' \
+    >/dev/null 2>&1 \
+    || fail "Faltam dependências Python no ambiente virtual. Execute ./install.sh novamente."
 
-if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
-    echo "Node.js e npm são necessários para iniciar o servidor do jogo."
-    echo "Instale Node.js (incluindo npm) e execute este script novamente."
-    exit 1
-fi
-echo "Node.js encontrado: $(node --version)"
-echo "npm encontrado: $(npm --version)"
+[[ -f "$BASE_DIR/detection_system/main.py" ]] || fail "Arquivo detection_system/main.py não encontrado."
+[[ -f "$SERVER_DIR/server.js" && -f "$SERVER_DIR/package.json" && -f "$SERVER_DIR/package-lock.json" ]] \
+    || fail "Arquivos do servidor do jogo não encontrados em $SERVER_DIR."
+command -v node >/dev/null 2>&1 || fail "Node.js não encontrado. Execute ./install.sh."
+node -e 'process.exit(Number(process.versions.node.split(".")[0]) < 18 ? 1 : 0)' \
+    || fail "Node.js 18 ou superior é necessário. Execute ./install.sh."
+command -v npm >/dev/null 2>&1 || fail "npm não encontrado. Execute ./install.sh."
 
-###############################################
-# 2) Criar ambiente virtual com Python 3.11
-###############################################
-if [ ! -x "$VENV_DIR/bin/python" ]; then
-    if [ -d "$VENV_DIR" ]; then
-        echo "Ambiente virtual incompleto. Recriando em $VENV_DIR..."
-        rm -rf "$VENV_DIR"
-    else
-        echo "Criando ambiente virtual em $VENV_DIR..."
-    fi
-    python3.11 -m venv "$VENV_DIR" || { echo "Erro ao criar venv"; exit 1; }
-else
-    echo "Ambiente virtual já existe. Pulando criação."
-fi
+NPM_DEPS_HASH="$(sha256sum "$SERVER_DIR/package.json" "$SERVER_DIR/package-lock.json")"
+[[ -d "$SERVER_DIR/node_modules/express" ]] \
+    && [[ -f "$NPM_STATE_FILE" ]] \
+    && [[ "$(cat "$NPM_STATE_FILE")" == "$NPM_DEPS_HASH" ]] \
+    && (cd "$SERVER_DIR" && npm ls --depth=0 --silent >/dev/null 2>&1) \
+    || fail "Dependências do servidor ausentes ou desatualizadas. Execute ./install.sh."
 
-# Ativar ambiente virtual
 source "$VENV_DIR/bin/activate"
-echo "Ambiente virtual ativado."
 
-###############################################
-# 3) Instalar dependências do requirements.txt
-###############################################
-if [ ! -f "$REQ_FILE" ]; then
-    echo "Arquivo requirements.txt não encontrado:"
-    echo "$REQ_FILE"
-    exit 1
-fi
-
-echo "Instalando/verificando dependências..."
-python -m pip install -r "$REQ_FILE" || {
-    echo "Erro ao instalar dependências"
-    exit 1
-}
-
-###############################################
-# Encerramento limpo ao pressionar Ctrl+C
-###############################################
+SERVER_PID=""
 cleanup() {
-    STATUS="${1:-0}"
-    echo -e "\nEncerrando processos..."
-
-    [ -n "$SERVER_PID" ] && kill "$SERVER_PID" 2>/dev/null
-    [ -n "$RECON_PID" ] && kill "$RECON_PID" 2>/dev/null
-
-    echo "Todos os processos foram encerrados."
-    exit "$STATUS"
+    local status=$?
+    trap - EXIT INT TERM
+    if [[ -n "$SERVER_PID" ]]; then
+        kill "$SERVER_PID" 2>/dev/null || true
+        wait "$SERVER_PID" 2>/dev/null || true
+    fi
+    exit "$status"
 }
-
-trap cleanup SIGINT
-
-###############################################
-# 4) Iniciar servidor HTTP
-###############################################
-cd "$BASE_DIR/game_server" || { echo "Erro: pasta game não encontrada"; exit 1; }
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 echo "Iniciando servidor HTTP na porta 3000..."
-npm install || { echo "Erro ao instalar dependências do servidor"; exit 1; }
-npm start &
+(cd "$SERVER_DIR" && exec node server.js) &
 SERVER_PID=$!
-echo "Servidor HTTP PID: $SERVER_PID"
-
-###############################################
-# 5) Iniciar menu principal do sistema Python
-###############################################
-cd "$BASE_DIR" || exit 1
 
 echo "Iniciando menu principal do sistema..."
-# O menu precisa permanecer em primeiro plano para receber as opções digitadas.
-"$VENV_DIR/bin/python" detection_system/main.py
-RECON_STATUS=$?
-cleanup "$RECON_STATUS"
+cd "$BASE_DIR"
+python detection_system/main.py

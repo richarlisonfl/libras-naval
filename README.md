@@ -13,10 +13,28 @@ O detector usa MediaPipe Tasks e o treinamento usa scikit-learn.
 
 ## Instalacao e execucao Linux
 
+Na primeira execução, instale o ambiente e as dependências:
+
 ```bash
-chmod +x linux_start_game.sh
-./linux_start_game.sh
+./install.sh
 ```
+
+O instalador prepara um ambiente virtual Python em `detection_system/.venv`,
+instala as dependências Python e Node.js e, quando necessário, os pré-requisitos
+do sistema. O preparo automático é voltado a Ubuntu e Debian; requer internet e
+`sudo` (não execute o instalador inteiro como root). Se Python 3.11 não estiver
+disponível como pacote, o instalador compila a versão estável mais recente da
+série 3.11. Se Node.js 18 ou superior não estiver disponível, configura o
+repositório NodeSource e instala Node.js 22.
+
+Depois, inicie o jogo:
+
+```bash
+./start.sh
+```
+
+`start.sh` não instala dependências: ele ativa o `.venv` existente e executa
+o menu Python com esse ambiente.
 
 Tambem e possivel executar somente o sistema Python:
 
