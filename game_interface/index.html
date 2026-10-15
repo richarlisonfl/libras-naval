@@ -4,40 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibrasNaval - Início</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div class="container-principal">
-        <div class="conteudo-superior">
-            <h1 class="titulo">LibrasNaval</h1>
-            <p class="descricao-turma">Jogo desenvolvido pela turma de TADS 2024 - IFPA Campus Paragominas</p>
-        </div>
+    <main class="container-principal">
+        <header class="conteudo-superior">
+            <p class="identificador">JOGO EDUCATIVO EM LIBRAS</p>
+            <h1>LibrasNaval</h1>
+            <p class="proposito">Libras, inclusão e tecnologia em uma aventura no mar.</p>
+        </header>
 
-        <div class="container-conteudo">
+        <section class="container-conteudo" aria-labelledby="titulo-jogo">
             <div class="cartao-informacoes">
-                <div class="texto-explicativo">
-                    <p>O <strong>LibrasNaval</strong> é uma versão acessível do clássico Batalha Naval,
-                    adaptado para o aprendizado de Língua Brasileira de Sinais.</p>
-                    <p>O tabuleiro possui linhas de 1 a 5 e colunas com as vogais A, E, I, O e U.<br>
-                    Seu objetivo é encontrar os navios escondidos realizando jogadas no tabuleiro.</p>
+                <div class="tabuleiro-ilustrativo" aria-label="Exemplo de coordenada A3">
+                    <div class="coordenada-atual">A3</div>
+                    <div class="grade-tabuleiro" aria-hidden="true">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span class="celula-ativa"></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
                 </div>
 
-                <div class="instrucao-libras">
-                    <h3 style="color: #202124; margin-top: 0px;margin-bottom: 0px;">Como Iniciar:</h3>
-                    <p>Para começar o jogo, faça o sinal <strong>"I Love You"</strong> para a câmera:</p>
-                    <div class="sinal-iloveyou"></div>
-                    <span>O sistema detectará automaticamente e iniciará o jogo.</span>
+                <div class="texto-explicativo">
+                    <p class="etapa">COMO JOGAR</p>
+                    <h2 id="titulo-jogo">Jogue usando sinais em Libras</h2>
+                    <p>Forme uma coordenada com o sinal de uma vogal e o sinal de um número. Cada par indica uma posição no tabuleiro.</p>
+                    <p class="exemplo-coordenada">Exemplo de jogada: <strong>A3</strong></p>
                 </div>
             </div>
+
+            <section class="instrucao-libras" aria-labelledby="titulo-inicio">
+                <div class="sinal-marca" aria-hidden="true"></div>
+                <div>
+                    <p class="etapa">PARA COMEÇAR</p>
+                    <h2 id="titulo-inicio">Faça o sinal I Love You para a câmera</h2>
+                    <p>O reconhecimento de sinais inicia a experiência e conecta você ao jogo.</p>
+                </div>
+            </section>
 
             <div class="container-botoes">
-                <!-- Botão apenas informativo -->
-                <button class="btn btn-libras" onclick="iniciarModoLibras()">
-                     Aguardando sinal da câmera...
+                <button class="btn btn-libras" type="button" onclick="iniciarModoLibras()">
+                    Aguardando o sinal I Love You
                 </button>
+                <p class="ajuda-botao">Ou selecione este botão para continuar sem usar a câmera.</p>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script type="module" src="index.js"></script>
 </body>

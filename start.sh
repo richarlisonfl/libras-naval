@@ -54,6 +54,47 @@ echo "Iniciando servidor HTTP na porta 3000..."
 (cd "$SERVER_DIR" && exec node server.js) &
 SERVER_PID=$!
 
+open_web_page() {
+    local url="http://localhost:3000"
+    if ! command -v xdg-open >/dev/null 2>&1; then
+        printf 'Não foi possível abrir o navegador automaticamente.\n'
+        printf 'Acesse manualmente: %s\n' "$url"
+        return 1
+    fi
+
+    xdg-open "$url" >/dev/null 2>&1 \
+        || {
+            printf 'Não foi possível abrir o navegador automaticamente.\n'
+            printf 'Acesse manualmente: %s\n' "$url"
+            return 1
+        }
+    printf 'Página web aberta em %s\n' "$url"
+}
+
+while true; do
+    printf '\n'
+    printf '%s\n' '================ LibrasNaval ================'
+    printf '%s\n' '1. Abrir página web'
+    printf '%s\n' '2. Iniciar menu principal do sistema'
+    printf '%s\n' '3. Sair'
+    read -r -p 'Escolha uma opção: ' opcao
+
+    case "$opcao" in
+        1)
+            open_web_page || true
+            ;;
+        2)
+            break
+            ;;
+        3)
+            exit 0
+            ;;
+        *)
+            printf 'Opção inválida. Escolha 1, 2 ou 3.\n'
+            ;;
+    esac
+done
+
 echo "Iniciando menu principal do sistema..."
 cd "$BASE_DIR"
 python detection_system/main.py

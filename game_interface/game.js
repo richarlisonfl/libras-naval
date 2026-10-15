@@ -11,7 +11,9 @@ worker.port.onmessage = async (ev) => {
     await handleMessage(ev.data.mensagem);
 };
 
-async function handleMessage(message){
+async function handleMessage(rawMessage) {
+    const message = rawMessage.toString().toLowerCase().trim();
+
     if (jogoFinalizado && message === 'ok') 
     {
         redirecionarParaIndex();
@@ -81,6 +83,24 @@ const colunas = ["A", "E", "I", "O", "U"];
 let navios = [];
 let acertos = 0;
 
+function atualizarJogadaAtual(colunaSelecionada, linhaSelecionada) {
+    document.getElementById("div-coluna").textContent = colunaSelecionada
+        ? `Coluna: ${colunaSelecionada.toUpperCase()}`
+        : "Coluna: ";
+    document.getElementById("div-linha").textContent = linhaSelecionada
+        ? `Linha: ${linhaSelecionada}`
+        : "Linha: ";
+}
+
+function mostrarCoordenadaDoMouse(event) {
+    const [, linhaSelecionada, colunaSelecionada] = event.currentTarget.id.split("-");
+    atualizarJogadaAtual(colunaSelecionada, linhaSelecionada);
+}
+
+function restaurarJogadaPorLibras() {
+    atualizarJogadaAtual(coluna, linha);
+}
+
 function clicarCelula(event) {
     if (jogoFinalizado) return;
     
@@ -122,6 +142,8 @@ function ativarTabuleiro() {
             let cell = document.getElementById(id);
             if (cell) {
                 cell.addEventListener("click", clicarCelula);
+                cell.addEventListener("mouseenter", mostrarCoordenadaDoMouse);
+                cell.addEventListener("mouseleave", restaurarJogadaPorLibras);
             }
         }
     }
@@ -172,52 +194,50 @@ function criarModalVitoria() {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.85);
+        padding: 24px;
+        background-color: rgba(23, 59, 92, 0.78);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 9999;
-        font-family: "Google Sans", arial, sans-serif;
+        font-family: "Trebuchet MS", Arial, sans-serif;
     `;
     
     const modal = document.createElement('div');
     modal.id = 'modal-vitoria';
     modal.style.cssText = `
-        background: linear-gradient(135deg, #81c995 0%, #8ab4f8 100%);
-        padding: 40px;
-        border-radius: 25px;
+        background: #ffffff;
+        padding: clamp(24px, 5vw, 40px);
+        border-radius: 18px;
         text-align: center;
         max-width: 600px;
-        width: 80%;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        border: 5px solid #ffe28a;
-        color: #202124;
+        width: min(100%, 600px);
+        border: 1px solid #c9dce1;
+        color: #173b5c;
     `;
     
     modal.innerHTML = `
-        <h1 style="font-size: 3.5rem; margin: 0 0 20px 0; color: #202124;">Parabéns!</h1>
+        <h1 style="font-size: clamp(2.2rem, 8vw, 3.5rem); margin: 0 0 20px; color: #173b5c;">Parabéns!</h1>
 
-        <div style="background-color: rgba(255, 255, 255, 0.9); 
-                    padding: 20px; 
-                    border-radius: 15px;
+        <div style="background-color: #e7f3f7;
+                    padding: 20px;
+                    border-radius: 12px;
                     margin-bottom: 30px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    max-height: 350px;
-                    overflow-y: auto;
-                    overflow-x: hidden; ">
-            <p id="pResultado" style="font-size: 1.3rem; margin: 10px 0;">
+                    color: #173b5c;">
+            <p id="pResultado" style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin: 10px 0;">
                  ${acertos} navios atingidos
             </p>
         </div>
         
-        <div style="font-size: 1.2rem; margin-top: 30px; color: #202124;">
-            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
-                <button id="btn-voltar-agora" style="background-color: #202124; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1.1rem; cursor: pointer;">
+        <div style="font-size: 1.2rem; margin-top: 30px; color: #173b5c;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
+                <button id="btn-voltar-agora" style="background-color: #173b5c; color: white; border: none; padding: 12px 25px; border-radius: 10px; font: inherit; font-size: 1.1rem; cursor: pointer;">
                     Voltar para o início
                 </button>
-                <button id="btn-jogar-novamente" style="background-color: #ffe28a; color: #202124; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
+                <button id="btn-jogar-novamente" style="background-color: #4f9d7a; color: white; border: none; padding: 12px 25px; border-radius: 10px; font: inherit; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
                     Jogar Novamente
                 </button>
             </div>

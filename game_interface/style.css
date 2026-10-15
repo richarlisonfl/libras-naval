@@ -1,0 +1,26 @@
+:root {
+    --azul-profundo: #173b5c;
+    --azul-medio: #2c6f95;
+    --azul-claro: #e7f3f7;
+    --areia: #f5f0e3;
+    --verde: #4f9d7a;
+    --verde-escuro: #317456;
+    --coral: #d9775d;
+    --texto-suave: #4b6676;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: "Trebuchet MS", Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: var(--areia);
+    color: var(--azul-profundo);
+}

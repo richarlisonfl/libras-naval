@@ -33,8 +33,10 @@ Depois, inicie o jogo:
 ./start.sh
 ```
 
-`start.sh` não instala dependências: ele ativa o `.venv` existente e executa
-o menu Python com esse ambiente.
+`start.sh` não instala dependências: ele inicia o servidor HTTP na porta 3000 e
+exibe um menu para abrir a página web no navegador ou executar o menu Python
+com o ambiente virtual existente. A página também pode ser acessada
+manualmente em <http://localhost:3000>.
 
 Tambem e possivel executar somente o sistema Python:
 
