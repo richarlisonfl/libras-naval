@@ -61,6 +61,13 @@ O treinamento atual nao usa imagens salvas em pastas. Os frames sao capturados p
 
 Treine pelo menos duas classes de cada tipo antes de usar o respectivo modelo. Os dados numericos e modelos ficam em `detection_system/data/generated_model/`.
 
+No menu de treinamento, a opção **Ver estatísticas dos sinais** lista as
+classes gravadas, o modo e as sessões registradas. A opção **Excluir um sinal
+gravado** remove todas as amostras de uma classe após confirmação explícita e
+retreina o modelo com os dados restantes. Se os dados não forem suficientes
+para gerar um modelo válido, o modelo correspondente é removido até que novas
+classes sejam treinadas.
+
 ## Reconhecimento hibrido
 
 Durante o jogo, o sistema analisa os dois tipos sem pedir uma selecao previa:

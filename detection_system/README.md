@@ -33,6 +33,13 @@ Sao necessarias pelo menos duas classes para gerar um modelo. Os arquivos gerado
 - `modelo_dinamico.pkl` e `sequencias_libras.npz` para sinais dinamicos;
 - `catalogo_treinamento.json` com o registro das sessoes.
 
+No menu de treinamento, a opção **Ver estatísticas dos sinais** mostra as
+classes gravadas, seus modos, sessões e pessoas registradas. A opção
+**Excluir um sinal gravado** remove todas as amostras de uma classe após a
+confirmação `EXCLUIR`, atualiza o catálogo e retreina o modelo correspondente
+com os dados restantes. Se não houver dados suficientes para treinar, o modelo
+é removido até que novas classes sejam capturadas.
+
 ## Reconhecimento hibrido
 
 O sistema usa uma unica captura da camera e carrega os modelos disponiveis:

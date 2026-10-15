@@ -1,16 +1,21 @@
 body {
-    min-height: 100vh;
-    padding: 48px 24px;
+    height: 100dvh;
+    overflow: hidden;
+    padding: clamp(12px, 3vh, 48px) clamp(16px, 3vw, 32px);
 }
 
 .container-principal {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     width: min(100%, 1000px);
+    height: 100%;
     margin: 0 auto;
+    gap: clamp(14px, 2.6vh, 28px);
 }
 
 .conteudo-superior {
     max-width: 760px;
-    margin: 0 auto 42px;
+    margin: 0 auto;
     text-align: center;
 }
 
@@ -18,7 +23,7 @@ body {
 .etapa {
     margin: 0 0 12px;
     color: var(--coral);
-    font-size: clamp(1rem, 2vw, 1.15rem);
+    font-size: clamp(0.75rem, 1.8vh, 1.15rem);
     font-weight: 800;
     letter-spacing: 0.13em;
 }
@@ -26,29 +31,31 @@ body {
 .conteudo-superior h1 {
     margin: 0;
     color: var(--azul-profundo);
-    font-size: clamp(3.4rem, 9vw, 6.6rem);
+    font-size: clamp(2.45rem, 8vh, 6.6rem);
     line-height: 0.95;
     letter-spacing: -0.07em;
 }
 
 .proposito {
-    margin: 20px auto 0;
+    margin: clamp(8px, 1.8vh, 20px) auto 0;
     color: var(--texto-suave);
-    font-size: clamp(1.3rem, 3vw, 1.85rem);
+    font-size: clamp(1rem, 2.6vh, 1.3rem);
     font-weight: 600;
     line-height: 1.35;
 }
 
 .container-conteudo {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    min-height: 0;
+    gap: clamp(10px, 2vh, 24px);
 }
 
 .cartao-informacoes {
     display: grid;
     grid-template-columns: minmax(240px, 0.9fr) minmax(320px, 1.1fr);
     align-items: stretch;
+    min-height: 0;
     overflow: hidden;
     border: 1px solid #c9dce1;
     border-radius: 18px;
@@ -58,8 +65,8 @@ body {
 .tabuleiro-ilustrativo {
     display: grid;
     place-items: center;
-    min-height: 295px;
-    padding: 32px;
+    min-height: 0;
+    padding: clamp(16px, 3vh, 32px);
     background: var(--azul-medio);
 }
 
@@ -67,13 +74,13 @@ body {
     z-index: 1;
     grid-area: 1 / 1;
     display: grid;
-    width: 94px;
-    height: 94px;
+    width: clamp(62px, 10vh, 94px);
+    height: clamp(62px, 10vh, 94px);
     place-items: center;
     border-radius: 50%;
     background: var(--coral);
     color: #ffffff;
-    font-size: 2.8rem;
+    font-size: clamp(1.8rem, 4.3vh, 2.8rem);
     font-weight: 800;
     letter-spacing: -0.05em;
 }
@@ -81,7 +88,7 @@ body {
 .grade-tabuleiro {
     grid-area: 1 / 1;
     display: grid;
-    width: min(100%, 235px);
+    width: min(100%, 235px, 26vh);
     aspect-ratio: 1;
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
@@ -103,28 +110,28 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 42px;
+    padding: clamp(18px, 3.8vh, 42px);
 }
 
 .texto-explicativo h2,
 .instrucao-libras h2 {
     margin: 0;
     color: var(--azul-profundo);
-    font-size: clamp(2rem, 4.2vw, 3rem);
+    font-size: clamp(1.55rem, 3.7vh, 3rem);
     line-height: 1.08;
     letter-spacing: -0.04em;
 }
 
 .texto-explicativo > p:not(.etapa) {
-    margin: 18px 0 0;
+    margin: clamp(9px, 1.7vh, 18px) 0 0;
     color: var(--texto-suave);
-    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-size: clamp(1rem, 2.2vh, 1.5rem);
     line-height: 1.48;
 }
 
 .texto-explicativo .exemplo-coordenada {
     color: var(--azul-medio);
-    font-size: clamp(1.2rem, 2.6vw, 1.55rem);
+    font-size: clamp(1rem, 2.25vh, 1.55rem);
     font-weight: 700;
 }
 
@@ -136,8 +143,8 @@ body {
 .instrucao-libras {
     display: flex;
     align-items: center;
-    gap: 28px;
-    padding: 30px 38px;
+    gap: clamp(14px, 2.6vh, 28px);
+    padding: clamp(16px, 2.8vh, 30px) clamp(20px, 3.5vw, 38px);
     border: 1px solid #c9dce1;
     border-left: 10px solid var(--verde);
     border-radius: 18px;
@@ -146,9 +153,9 @@ body {
 
 .sinal-marca {
     position: relative;
-    flex: 0 0 92px;
-    width: 92px;
-    height: 92px;
+    flex: 0 0 clamp(64px, 10vh, 92px);
+    width: clamp(64px, 10vh, 92px);
+    height: clamp(64px, 10vh, 92px);
     border: 2px solid var(--verde);
     border-radius: 50%;
 }
@@ -161,18 +168,18 @@ body {
 }
 
 .sinal-marca::before {
-    width: 34px;
-    height: 42px;
-    bottom: 20px;
-    left: 28px;
+    width: 37%;
+    height: 46%;
+    bottom: 22%;
+    left: 30%;
     border-radius: 18px 18px 10px 10px;
 }
 
 .sinal-marca::after {
-    width: 30px;
-    height: 8px;
-    top: 24px;
-    left: 45px;
+    width: 33%;
+    height: 9%;
+    top: 26%;
+    left: 49%;
     border-radius: 99px;
     transform: rotate(-43deg);
     transform-origin: left center;
@@ -184,9 +191,9 @@ body {
 }
 
 .instrucao-libras p:not(.etapa) {
-    margin: 14px 0 0;
+    margin: clamp(8px, 1.5vh, 14px) 0 0;
     color: var(--texto-suave);
-    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-size: clamp(1rem, 2.2vh, 1.5rem);
     line-height: 1.45;
 }
 
@@ -194,20 +201,20 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding-top: 8px;
+    gap: clamp(6px, 1.4vh, 14px);
+    padding-top: 0;
 }
 
 .btn {
-    min-height: 68px;
-    padding: 16px 32px;
+    min-height: clamp(50px, 7.2vh, 68px);
+    padding: clamp(10px, 1.8vh, 16px) clamp(20px, 3vw, 32px);
     border: 0;
     border-radius: 12px;
     background: var(--verde);
     color: #ffffff;
     cursor: pointer;
     font: inherit;
-    font-size: clamp(1.25rem, 2.8vw, 1.6rem);
+    font-size: clamp(1.05rem, 2.4vh, 1.6rem);
     font-weight: 800;
     transition: background-color 0.15s ease, transform 0.15s ease;
 }
@@ -229,18 +236,14 @@ body {
 .ajuda-botao {
     margin: 0;
     color: var(--texto-suave);
-    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+    font-size: clamp(0.9rem, 1.9vh, 1.25rem);
     font-weight: 600;
     text-align: center;
 }
 
 @media (max-width: 680px) {
     body {
-        padding: 32px 16px;
-    }
-
-    .conteudo-superior {
-        margin-bottom: 30px;
+        padding: 12px 14px;
     }
 
     .cartao-informacoes {
@@ -248,7 +251,7 @@ body {
     }
 
     .tabuleiro-ilustrativo {
-        min-height: 245px;
+        display: none;
     }
 
     .texto-explicativo,
@@ -283,5 +286,24 @@ body {
 
     .btn {
         width: 100%;
+    }
+}
+
+@media (max-height: 700px) {
+    .identificador,
+    .etapa {
+        letter-spacing: 0.06em;
+    }
+
+    .texto-explicativo,
+    .instrucao-libras {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .sinal-marca {
+        flex-basis: 56px;
+        width: 56px;
+        height: 56px;
     }
 }

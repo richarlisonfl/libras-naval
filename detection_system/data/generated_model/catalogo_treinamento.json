@@ -15,12 +15,44 @@
     ],
     "sessoes": 1
   },
-  "estatico:E": {
-    "sinal": "E",
+  "estatico:1": {
+    "sinal": "1",
     "modo": "estatico",
     "pessoas": [
-      "RICHARLISON"
+      "richarlison"
+    ],
+    "sessoes": 2
+  },
+  "estatico:2": {
+    "sinal": "2",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
     ],
     "sessoes": 1
+  },
+  "estatico:3": {
+    "sinal": "3",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
+    ],
+    "sessoes": 2
+  },
+  "estatico:4": {
+    "sinal": "4",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
+    ],
+    "sessoes": 2
+  },
+  "estatico:5": {
+    "sinal": "5",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
+    ],
+    "sessoes": 2
   }
 }

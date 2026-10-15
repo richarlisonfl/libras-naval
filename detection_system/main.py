@@ -3,7 +3,6 @@ import os
 import sys
 import subprocess
 import time
-import json
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
@@ -15,6 +14,7 @@ if BASE_DIR not in sys.path:
 
 import config
 from src.core.camera import Camera
+from src.services.gerenciar_treinamento import GerenciadorTreinamento
 from src.services.treino_sinais import TreinoSinais
 from src.services.reconhecimento_hibrido import ReconhecimentoHibrido
 from src.services.reconhecimento_navegador import ReconhecimentoNavegador
@@ -53,7 +53,8 @@ def exibir_menu_treinamento():
     print("1. Treinar um sinal estático")
     print("2. Treinar um sinal com movimento")
     print("3. Ver estatísticas dos sinais")
-    print("4. Voltar ao Menu Principal")
+    print("4. Excluir um sinal gravado")
+    print("5. Voltar ao Menu Principal")
     print("-" * 60)
 
 
@@ -87,23 +88,57 @@ def executar_treino_individual(modo):
 
 
 def exibir_estatisticas():
-    caminho = os.path.join(config.CONFIG['caminho_modelos'], 'catalogo_treinamento.json')
-    if not os.path.exists(caminho):
+    sinais = GerenciadorTreinamento.listar_sinais()
+    if not sinais:
         print("\nNenhuma sessão de treinamento registrada.")
         return
 
-    with open(caminho, encoding='utf-8') as arquivo:
-        catalogo = json.load(arquivo)
-
     print("\nESTATÍSTICAS DOS SINAIS")
     print("-" * 60)
-    for registro in catalogo.values():
+    for registro in sinais:
         pessoas = len(registro.get('pessoas', []))
         sessoes = registro.get('sessoes', 0)
         print(
             f"{registro['sinal']} ({registro['modo']}): "
             f"{sessoes} sessões, {pessoas} pessoas"
         )
+
+
+def excluir_sinal_gravado():
+    sinais = GerenciadorTreinamento.listar_sinais()
+    if not sinais:
+        print("\nNenhum sinal gravado para excluir.")
+        return
+
+    print("\nSINAIS GRAVADOS")
+    print("-" * 60)
+    for indice, registro in enumerate(sinais, start=1):
+        print(f"{indice}. {registro['sinal']} ({registro['modo']})")
+
+    escolha = input("\nNúmero do sinal a excluir: ").strip()
+    if not escolha.isdigit() or not 1 <= int(escolha) <= len(sinais):
+        print("Seleção inválida. Nenhum sinal foi excluído.")
+        return
+
+    registro = sinais[int(escolha) - 1]
+    confirmacao = input(
+        f"Digite EXCLUIR para remover {registro['sinal']} "
+        f"({registro['modo']}): "
+    ).strip()
+    if confirmacao != "EXCLUIR":
+        print("Exclusão cancelada.")
+        return
+
+    try:
+        removidas = GerenciadorTreinamento().excluir_sinal(
+            registro["modo"], registro["sinal"]
+        )
+        print(
+            f"{removidas} amostra(s) de {registro['sinal']} removida(s). "
+            "Os modelos disponíveis foram atualizados."
+        )
+    except (OSError, ValueError) as erro:
+        print(f"Não foi possível excluir o sinal: {erro}")
 
 
 def executar_reconhecimento():
@@ -159,7 +194,7 @@ def executar_teste_setup():
 def menu_treinamento():
     while True:
         exibir_menu_treinamento()
-        opcao = input("\nEscolha uma opção (1-4): ").strip()
+        opcao = input("\nEscolha uma opção (1-5): ").strip()
         
         if opcao == "1":
             executar_treino_individual("estatico")
@@ -168,12 +203,14 @@ def menu_treinamento():
         elif opcao == "3":
             exibir_estatisticas()
         elif opcao == "4":
+            excluir_sinal_gravado()
+        elif opcao == "5":
             print("Voltando ao menu principal...\n")
             break
         else:
             print(" Opção inválida! Tente novamente.")
         
-        if opcao in ["1", "2", "3"]:
+        if opcao in ["1", "2", "3", "4"]:
             pausar_menu("\nPressione ENTER para voltar ao menu de treinamento...")
 
 
