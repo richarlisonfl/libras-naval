@@ -178,6 +178,12 @@ table.tabuleiro td:hover {
     background-color: #ffe28a !important;
 }
 
+table.tabuleiro th.selecionado {
+    color: #202124;
+    outline: 4px solid #235483;
+    outline-offset: -4px;
+}
+
 @media (max-width: 1050px) {
     :root {
         --tamanho-celula: min(14.5475vw, 13.88625dvh, 108px, calc((100dvh - 175px) / 6));

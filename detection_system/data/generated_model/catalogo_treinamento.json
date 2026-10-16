@@ -53,6 +53,22 @@
     "pessoas": [
       "richarlison"
     ],
+    "sessoes": 3
+  },
+  "estatico:E": {
+    "sinal": "E",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
+    ],
+    "sessoes": 1
+  },
+  "estatico:OK": {
+    "sinal": "OK",
+    "modo": "estatico",
+    "pessoas": [
+      "richarlison"
+    ],
     "sessoes": 2
   }
 }

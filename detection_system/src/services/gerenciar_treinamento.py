@@ -39,7 +39,7 @@ class GerenciadorTreinamento:
         classificador = ClassificadorLibras()
         carregado = classificador.carregar_dados_treinamento()
         if carregado is None:
-            raise ValueError("Não há dados estáticos salvos.")
+            return 0
 
         dados, rotulos, grupos = carregado
         indices_mantidos = [
@@ -47,7 +47,7 @@ class GerenciadorTreinamento:
         ]
         removidas = len(rotulos) - len(indices_mantidos)
         if removidas == 0:
-            raise ValueError(f"O sinal estático {sinal} não possui amostras salvas.")
+            return 0
 
         dados_restantes = [dados[indice] for indice in indices_mantidos]
         rotulos_restantes = [rotulos[indice] for indice in indices_mantidos]
@@ -69,7 +69,7 @@ class GerenciadorTreinamento:
         ]
         removidas = len(rotulos) - len(indices_mantidos)
         if removidas == 0:
-            raise ValueError(f"O sinal dinâmico {sinal} não possui sequências salvas.")
+            return 0
 
         sequencias_restantes = [sequencias[indice] for indice in indices_mantidos]
         rotulos_restantes = [rotulos[indice] for indice in indices_mantidos]

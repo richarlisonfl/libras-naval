@@ -78,6 +78,23 @@ camera -> MediaPipe -> landmarks -> modelos estatico e dinamico -> WebSocket -> 
 
 Uma mao estavel favorece o modelo estatico; um movimento detectado favorece o modelo dinamico. Os limites podem ser ajustados em [detection_system/config.py](detection_system/config.py).
 
+## Dados de partidas
+
+Ao concluir uma partida, o navegador salva um registro local em
+`localStorage` com a faixa etária selecionada, identificador de sessão, data,
+duração, jogadas, acertos, erros, precisão e a quantidade de jogadas feitas
+por Libras e por mouse. O histórico usa a chave `librasNaval.resultados` e
+permite comparar, futuramente, o desempenho por faixa etária e por modalidade
+de interação. Os dados não são enviados a um servidor.
+
+Os relatórios podem ser visualizados no mesmo navegador em
+<http://localhost:3000/relatorios.html>. Essa página não é vinculada às telas
+do jogo e permite exportar o histórico em CSV ou JSON.
+
+Durante o desenvolvimento, o botão **Limpar registros** da página de
+relatórios remove o histórico de partidas do navegador após confirmação. Essa
+ação não remove os modelos nem os dados de treinamento do sistema Python.
+
 ## Windows
 
 ```powershell

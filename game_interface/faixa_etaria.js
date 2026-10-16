@@ -1,11 +1,11 @@
 const faixaElement = document.getElementById('faixa-selecionada');
 const botaoConfirmar = document.getElementById('btn-confirmar');
 const faixas = {
-    '1': 'Até 6 anos',
-    '2': '7 a 10 anos',
-    '3': '11 a 14 anos',
-    '4': '15 a 17 anos',
-    '5': '18 anos ou mais'
+    '1': 'Até 13 anos',
+    '2': '14 a 15 anos',
+    '3': '16 a 17 anos',
+    '4': '18 a 19 anos',
+    '5': '20 anos ou mais'
 };
 
 let faixaSelecionada = null;

@@ -133,10 +133,16 @@ def excluir_sinal_gravado():
         removidas = GerenciadorTreinamento().excluir_sinal(
             registro["modo"], registro["sinal"]
         )
-        print(
-            f"{removidas} amostra(s) de {registro['sinal']} removida(s). "
-            "Os modelos disponíveis foram atualizados."
-        )
+        if removidas:
+            print(
+                f"{removidas} amostra(s) de {registro['sinal']} removida(s). "
+                "Os modelos disponíveis foram atualizados."
+            )
+        else:
+            print(
+                f"O registro de {registro['sinal']} foi removido do catálogo. "
+                "Não havia amostras salvas para esse sinal."
+            )
     except (OSError, ValueError) as erro:
         print(f"Não foi possível excluir o sinal: {erro}")
 

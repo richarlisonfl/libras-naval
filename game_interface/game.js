@@ -23,11 +23,13 @@ async function handleMessage(rawMessage) {
     if (['a', 'e', 'i', 'o', 'u'].some((v) => v === message))
     {
         coluna = message;
-        document.getElementById("div-coluna").textContent = `Coluna: ${message.toUpperCase()}`;
+        atualizarJogadaAtual(coluna, linha);
+        atualizarDestaquesTabuleiro(coluna, linha);
     } else if ([1, 2, 3, 4, 5].some((v) => v == message))
     {
         linha = message;
-        document.getElementById("div-linha").textContent = `Linha: ${message}`;
+        atualizarJogadaAtual(coluna, linha);
+        atualizarDestaquesTabuleiro(coluna, linha);
     } else if (['ok', 'limpar'].some((v) => v === message))
     {
         acao = message;
@@ -35,11 +37,11 @@ async function handleMessage(rawMessage) {
 
     if (message === 'limpar')
     {
-        document.getElementById("div-coluna").textContent = "Coluna: "
-        document.getElementById("div-linha").textContent = "Linha: "
         coluna = undefined;
         linha = undefined;
         acao = undefined;
+        atualizarJogadaAtual(coluna, linha);
+        atualizarDestaquesTabuleiro(coluna, linha);
         return;
     }
 
@@ -53,26 +55,13 @@ async function handleMessage(rawMessage) {
         const id = `cell-${linha}-${coluna.toUpperCase()}`;
         let cell = document.getElementById(id);
 
-        if (cell && !cell.classList.contains("erro") && !cell.classList.contains("acerto")) {
-            if (navios.includes(id)) {
-                cell.classList.add("acerto");
-                acertos++;
-                console.log(`Acerto! ${acertos}/${navios.length} navios`);
-                
-                if (acertos === navios.length) {
-                    finalizarJogoComVitoria();
-                }
-            } else {
-                cell.classList.add("erro");
-            }
-
-            document.getElementById("div-coluna").textContent = "Coluna: "
-            document.getElementById("div-linha").textContent = "Linha: "
+        if (cell && registrarTiro(cell, "libras")) {
             coluna = undefined;
             linha = undefined;
+            atualizarJogadaAtual(coluna, linha);
+            atualizarDestaquesTabuleiro(coluna, linha);
         }
-        
-        atualizarContagemNavios();
+
         acao = undefined;
     }
 }
@@ -82,6 +71,13 @@ const colunas = ["A", "E", "I", "O", "U"];
 
 let navios = [];
 let acertos = 0;
+let jogadas = 0;
+let erros = 0;
+let jogadasPorLibras = 0;
+let jogadasPorMouse = 0;
+let resultadoRegistrado = false;
+
+const CHAVE_RESULTADOS = "librasNaval.resultados";
 
 function atualizarJogadaAtual(colunaSelecionada, linhaSelecionada) {
     document.getElementById("div-coluna").textContent = colunaSelecionada
@@ -92,13 +88,37 @@ function atualizarJogadaAtual(colunaSelecionada, linhaSelecionada) {
         : "Linha: ";
 }
 
+function atualizarDestaquesTabuleiro(colunaSelecionada, linhaSelecionada) {
+    document.querySelectorAll(".tabuleiro th.selecionado").forEach((cabecalho) => {
+        cabecalho.classList.remove("selecionado");
+    });
+
+    if (colunaSelecionada) {
+        document.querySelectorAll(".tabuleiro thead th").forEach((cabecalho) => {
+            if (cabecalho.textContent.trim() === colunaSelecionada.toUpperCase()) {
+                cabecalho.classList.add("selecionado");
+            }
+        });
+    }
+
+    if (linhaSelecionada) {
+        document.querySelectorAll(".tabuleiro tbody th").forEach((cabecalho) => {
+            if (cabecalho.textContent.trim() === String(linhaSelecionada)) {
+                cabecalho.classList.add("selecionado");
+            }
+        });
+    }
+}
+
 function mostrarCoordenadaDoMouse(event) {
     const [, linhaSelecionada, colunaSelecionada] = event.currentTarget.id.split("-");
     atualizarJogadaAtual(colunaSelecionada, linhaSelecionada);
+    atualizarDestaquesTabuleiro(colunaSelecionada, linhaSelecionada);
 }
 
 function restaurarJogadaPorLibras() {
     atualizarJogadaAtual(coluna, linha);
+    atualizarDestaquesTabuleiro(coluna, linha);
 }
 
 function clicarCelula(event) {
@@ -106,25 +126,36 @@ function clicarCelula(event) {
     
     let cell = event.target;
 
+    registrarTiro(cell, "mouse");
+}
+
+function registrarTiro(cell, origem) {
     if (cell.classList.contains("erro") || cell.classList.contains("acerto")) {
-        return;
+        return false;
     }
 
-    let id = cell.id;
+    jogadas++;
+    if (origem === "libras") {
+        jogadasPorLibras++;
+    } else {
+        jogadasPorMouse++;
+    }
 
-    if (navios.includes(id)) {
+    if (navios.includes(cell.id)) {
         cell.classList.add("acerto");
         acertos++;
-        console.log(`Acerto via clique! ${acertos}/${navios.length} navios`);
+        console.log(`Acerto via ${origem}! ${acertos}/${navios.length} navios`);
 
         if (acertos === navios.length) {
             finalizarJogoComVitoria();
         }
     } else {
         cell.classList.add("erro");
+        erros++;
     }
 
     atualizarContagemNavios();
+    return true;
 }
 
 function atualizarContagemNavios() {
@@ -171,6 +202,8 @@ function finalizarJogoComVitoria() {
     if (jogoFinalizado) return; // Evita execução múltipla
     
     jogoFinalizado = true;
+    clearInterval(cronometro);
+    registrarResultadoPartida();
     console.log(' JOGO FINALIZADO - TODOS NAVIOS AFUNDADOS ');
     
     // Desabilita todos os cliques
@@ -180,6 +213,40 @@ function finalizarJogoComVitoria() {
     
     // Opção 1: Modal de vitória
     criarModalVitoria();
+}
+
+function registrarResultadoPartida() {
+    if (resultadoRegistrado) {
+        return;
+    }
+
+    const codigoFaixaEtaria = localStorage.getItem("faixa_etaria");
+    const resultado = {
+        idSessao: localStorage.getItem("id_sessao"),
+        concluidaEm: new Date().toISOString(),
+        faixaEtaria: codigoFaixaEtaria,
+        faixaEtariaDescricao: faixasEtarias[codigoFaixaEtaria] ?? "Não informada",
+        duracaoSegundos: totalSegundos,
+        jogadas,
+        acertos,
+        erros,
+        precisao: jogadas ? Number((acertos / jogadas).toFixed(4)) : 0,
+        jogadasPorLibras,
+        jogadasPorMouse,
+        vitoriaCompleta: acertos === navios.length,
+    };
+
+    try {
+        const resultados = JSON.parse(localStorage.getItem(CHAVE_RESULTADOS) ?? "[]");
+        if (!Array.isArray(resultados)) {
+            throw new TypeError("O histórico de resultados não é uma lista.");
+        }
+        resultados.push(resultado);
+        localStorage.setItem(CHAVE_RESULTADOS, JSON.stringify(resultados));
+        resultadoRegistrado = true;
+    } catch (erro) {
+        console.error("Não foi possível salvar o resultado da partida.", erro);
+    }
 }
 
 // MODAL DE VITÓRIA
@@ -272,11 +339,11 @@ console.log('game.js carregado. Aguardando jogo...');
 
 let span = document.getElementById('faixa-etaria-jogador')
 const faixasEtarias = {
-    '1': 'Até 6 anos',
-    '2': '7 a 10 anos',
-    '3': '11 a 14 anos',
-    '4': '15 a 17 anos',
-    '5': '18 anos ou mais'
+    '1': 'Até 13 anos',
+    '2': '14 a 15 anos',
+    '3': '16 a 17 anos',
+    '4': '18 a 19 anos',
+    '5': '20 anos ou mais'
 };
 span.innerText = faixasEtarias[localStorage.getItem('faixa_etaria')] ?? 'Não informada'
 
@@ -289,7 +356,7 @@ function formatar(seg) {
     return `${h}:${m}:${s}`;
 }
 
-setInterval(() => {
+const cronometro = setInterval(() => {
     totalSegundos++;
     document.getElementById("div-tempo").textContent = `Tempo: ${formatar(totalSegundos)}`;
 }, 1000);

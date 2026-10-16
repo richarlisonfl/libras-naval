@@ -30,7 +30,8 @@ function iniciarModoLibras() {
     redirecionarParaEscolhaNome();
 }
 
-localStorage.clear();
+localStorage.removeItem('faixa_etaria');
+localStorage.removeItem('id_sessao');
 
 // Torna função global para o botão
 window.iniciarModoLibras = iniciarModoLibras;

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrasNaval - Relatórios</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="relatorios.css">
+</head>
+<body>
+    <main class="pagina-relatorios">
+        <header class="cabecalho-relatorios">
+            <p class="identificador">PESQUISA E ACOMPANHAMENTO</p>
+            <h1>LibrasNaval</h1>
+            <p>Resultados das partidas salvos neste navegador.</p>
+        </header>
+
+        <section class="acoes-relatorio" aria-label="Exportação dos relatórios">
+            <button type="button" id="exportar-csv">Salvar em CSV</button>
+            <button type="button" id="exportar-json">Salvar em JSON</button>
+            <button type="button" id="limpar-registros" class="btn-perigo">
+                Limpar registros
+            </button>
+        </section>
+
+        <section class="resumo" aria-label="Resumo geral">
+            <article>
+                <span>Partidas concluídas</span>
+                <strong id="total-partidas">0</strong>
+            </article>
+            <article>
+                <span>Precisão média</span>
+                <strong id="precisao-media">0%</strong>
+            </article>
+            <article>
+                <span>Tempo médio</span>
+                <strong id="tempo-medio">0 s</strong>
+            </article>
+            <article>
+                <span>Jogadas por Libras</span>
+                <strong id="jogadas-libras">0</strong>
+            </article>
+        </section>
+
+        <section class="cartao-relatorio">
+            <div class="titulo-secao">
+                <div>
+                    <p class="identificador">FAIXAS ETÁRIAS</p>
+                    <h2>Desempenho por grupo</h2>
+                </div>
+                <p id="atualizado-em">Nenhuma partida registrada.</p>
+            </div>
+            <div class="tabela-responsiva">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faixa etária</th>
+                            <th>Partidas</th>
+                            <th>Precisão média</th>
+                            <th>Tempo médio</th>
+                            <th>Jogadas por Libras</th>
+                            <th>Jogadas por mouse</th>
+                        </tr>
+                    </thead>
+                    <tbody id="relatorio-faixas"></tbody>
+                </table>
+            </div>
+            <p id="estado-vazio" hidden>
+                Ainda não há partidas concluídas neste navegador.
+            </p>
+        </section>
+    </main>
+
+    <script src="relatorios.js"></script>
+</body>
+</html>
