@@ -7,14 +7,6 @@
     ],
     "sessoes": 1
   },
-  "estatico:B": {
-    "sinal": "B",
-    "modo": "estatico",
-    "pessoas": [
-      "RICHARLISON"
-    ],
-    "sessoes": 1
-  },
   "estatico:1": {
     "sinal": "1",
     "modo": "estatico",
@@ -61,7 +53,7 @@
     "pessoas": [
       "richarlison"
     ],
-    "sessoes": 1
+    "sessoes": 3
   },
   "estatico:OK": {
     "sinal": "OK",
